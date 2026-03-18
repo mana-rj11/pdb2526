@@ -1,0 +1,9 @@
+--Vide les tables
+DELETE FROM TTYPE_PIECE;
+--Encode les données dans la base de données de test
+--TTYPEPIECE
+INSERT INTO TTYPE_PIECE (CODE_TYP, NOM_TYP, HUMIDE_TYP) VALUES('SALON','Salon',false);
+INSERT INTO TTYPE_PIECE (CODE_TYP, NOM_TYP, HUMIDE_TYP) VALUES('LIVING','Living',false);
+INSERT INTO TTYPE_PIECE (CODE_TYP, NOM_TYP, HUMIDE_TYP) VALUES('SDB','Salle de bain',true);
+
+
