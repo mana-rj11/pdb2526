@@ -80,7 +80,9 @@ public class SQLTypePieceDao implements ITypePieceDao {
 				this.connexion.commit();
 			log.debug("Ajout d'un TypePièce: " + obj);
 		} catch (SQLException e) {
-			log.error("Insertion non validée: " + obj);
+			log.error("Insertion non validée: " + e);
+			if (!this.connexion.getAutoCommit())
+				this.connexion.rollback();
 			this.factory.dispatchException(e, "TTYPE_PIECE");
 		}
 		return obj;

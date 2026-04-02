@@ -19,26 +19,28 @@ public abstract class DAOFactory {
 //DAO que doit fournir chaque fabrique concrète
 	public abstract ITypePieceDao getTypePieceDAO();
 
+	public abstract IPieceDao getPieceDAO();
+
 	// Méthode statique que génère des fabriques concrètes
 	public static DAOFactory getDAOFactory(TypePersistance typeP, Connection connect) {
 		switch (typeP) {
 		case FIREBIRD:
 			return new FBDAOFactory(connect);
 		case H2:
-			return null;//new H2DAOFactory(connect);
+			return null;// new H2DAOFactory(connect);
 		case POSTGRESQL:
-			return null;//new PostgreSqlDAOFactory(connect);
+			return null;// new PostgreSqlDAOFactory(connect);
 
 		default:
 			return null;
 		}
 	}
 
-  // Retourne la connection SQL
+	// Retourne la connection SQL
 	public abstract Connection getConnection();
 
-  // Permet de transformer une exception SQL vers une exception Propre à mon application
-	protected abstract void dispatchException(Exception e,String detail) throws InstallationException;
-	
+	// Permet de transformer une exception SQL vers une exception Propre à mon
+	// application
+	protected abstract void dispatchException(Exception e, String detail) throws InstallationException;
 
 }
