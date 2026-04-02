@@ -1,5 +1,6 @@
 package org.isfce.pdb.dao;
 
+import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -9,6 +10,8 @@ import org.isfce.pdb.dao.DAOFactory.TypePersistance;
 import org.isfce.pdb.databases.connexion.ConnexionFromFile;
 import org.isfce.pdb.databases.connexion.ConnexionSingleton;
 import org.isfce.pdb.databases.uri.Databases;
+import org.isfce.pdb.exceptions.InstallationException;
+import org.isfce.pdb.exceptions.PKException;
 import org.isfce.pdb.model.TypePiece;
 import org.isfce.pdb.util.DatabaseUtil;
 import org.junit.jupiter.api.AfterAll;
@@ -49,6 +52,12 @@ public class TestDaoTypePiece {
 		var liste = dao.getListe(null);
 		assertTrue(liste.size() == 3);
 		assertEquals(p, liste.get(1));
+	}
+	@Test
+	void testInsert() {
+		TypePiece tp1=new TypePiece("SALON", "doublon!!", false);
+		assertThrows(PKException.class,()-> dao.insert(tp1));
+		
 	}
 
 }

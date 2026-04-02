@@ -1,8 +1,10 @@
 package org.isfce.pdb.dao;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 
 import org.isfce.pdb.exceptions.InstallationException;
+import org.isfce.pdb.exceptions.PKException;
 
 public class FBDAOFactory extends DAOFactory {
 	private Connection connexion;
@@ -26,7 +28,21 @@ public class FBDAOFactory extends DAOFactory {
 
 	@Override
 	protected void dispatchException(Exception e, String detail) throws InstallationException {
-		throw new InstallationException(" Problème ");
+		SQLException exc = (SQLException) e;
+
+		throw switch (exc.getErrorCode()) {
+		case 335544665 -> new PKException(e.getMessage(), detail);
+
+		default -> new InstallationException(" Problème ");
+
+		};
+
+	}
+	
+	private static String findNom(String erreur) {
+		int i = erreur.indexOf(".\"") + 2;
+		int j = erreur.indexOf("\"", i);
+		return erreur.substring(i, j - 4);
 	}
 
 }
