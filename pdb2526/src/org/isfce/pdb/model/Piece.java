@@ -5,13 +5,15 @@ import java.math.BigDecimal;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 @Builder
-@ToString(exclude = {"typePiece","installation","description"})
+@ToString//(exclude = {"typePiece","installation","description"})
 @EqualsAndHashCode
 @Getter
+@Setter
 public class Piece {
-	private Integer id;
+	private Integer id;//AUTO-Généré par la BD
 	private String nom;
 	private String description;
 	private BigDecimal etage;

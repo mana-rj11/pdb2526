@@ -43,7 +43,7 @@ public class FBDAOFactory extends DAOFactory {
 		case 335544665 -> new PKException(e.getMessage(), detail);
 		case 335544347 -> new CheckException(e.getMessage(), detail);
 
-		default -> new InstallationException(" Problème ");
+		default -> new InstallationException(" Problème "+exc);
 
 		};
 
