@@ -50,7 +50,7 @@ public class TestDaoTypePiece {
 	@Test
 	void testGetListe() throws SQLException {
 		var liste = dao.getListe(null);
-		assertTrue(liste.size() == 3);
+		assertEquals(4,liste.size());
 		assertEquals(p, liste.get(1));
 	}
 	@Test

@@ -19,7 +19,7 @@ public class FBDAOFactory extends DAOFactory {
 	@Override
 	public ITypePieceDao getTypePieceDAO() {
 		if (daoTypePiece == null)
-			daoTypePiece = new SQLTypePieceDao(this);
+			daoTypePiece =  new CacheTypePieceDao(new SQLTypePieceDao(this));
 		return daoTypePiece;
 	}
 
