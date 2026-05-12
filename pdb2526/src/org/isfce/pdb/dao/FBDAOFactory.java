@@ -10,6 +10,7 @@ import org.isfce.pdb.exceptions.PKException;
 public class FBDAOFactory extends DAOFactory {
 	private Connection connexion;
 	private ITypePieceDao daoTypePiece = null;
+	private ISvgDao daoSvg = null;
 	private IPieceDao daoPiece = null;
 
 	public FBDAOFactory(Connection connexion) {
@@ -28,6 +29,12 @@ public class FBDAOFactory extends DAOFactory {
 		if (daoPiece == null)
 			daoPiece = new SQLPieceDao(this);
 		return daoPiece;
+	}
+	
+	public ISvgDao getSvgDao() {
+		if (daoSvg == null)
+			daoSvg = new CacheSvgDao(new SQLSvgDao(this));
+		return daoSvg;
 	}
 
 	@Override
