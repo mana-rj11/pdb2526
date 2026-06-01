@@ -12,7 +12,6 @@ import lombok.ToString;
  * x, y : position sur le plan
  * a : angle de rotation (0 par défaut = horizontal)
  */
-
 @Getter
 @Setter
 @ToString
@@ -22,5 +21,4 @@ public class Localisation {
 	private double x;
 	private double y;
 	private double a;
-
 }
