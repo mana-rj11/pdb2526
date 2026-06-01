@@ -1,0 +1,73 @@
+package org.isfce.pdb.dao;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
+
+import org.isfce.pdb.exceptions.InstallationException;
+import org.isfce.pdb.model.Plan;
+
+/**
+ * Implémentation SQL du DAO Plan pour Firebird
+ */
+public class SQLPlanDao implements IPlanDao {
+	
+	private static final Logger logger = Logger.getLogger(SQLPlanDao.class.getName());
+	private final DAOFactory factory;
+	
+	public SQLPlanDao(DAOFactory factory) {
+		this.factory = factory;
+	}
+	
+	private Plan mapResultSet(ResultSet rs) throws Exception {
+		return new Plan(
+			rs.getInt("ID_PLA"),
+			rs.getString("NOM_PLA")
+		);	
+	}
+	
+	@Override
+	public List<Plan> getListePlanFromInstallation(int installation) throws InstallationException {
+		String sql = "SELECT * FROM TPLAN WHERE FKINSTALLATION_PLA = ?";
+		Connection connect = factory.getConnection();
+		List<Plan> liste = new ArrayList<>();
+		try (PreparedStatement ps = connect.prepareStatement(sql)) {
+			ps.setInt(1, installation);
+			try (ResultSet rs = ps.executeQuery()) {
+				while (rs.next()) {
+					liste.add(mapResultSet(rs));
+				}
+			}
+			logger.info("Plans chargés pour installation " + installation + " : " + liste.size());
+		} catch (Exception e) {
+			factory.dispatchException(e, "getListePlanFromInstallation " + installation);
+		}
+		return liste;
+	}
+	
+
+	@Override
+	public Plan insert(Plan obj) throws InstallationException {
+		String sql = "INSERT INTO PLAN (NOM_PLA, FKINSTALLATION_PLA) VALUES (?, ?)";
+		Connection connect = factory.getConnection();
+		try (PreparedStatement ps = connect.prepareStatement(sql,
+				java.sql.Statement.RETURN_GENERATED_KEYS)) {
+			ps.setString(1, obj.getFichier());
+			ps.setInt(2, 0); // sera fourni par la façade
+			ps.executeUpdate();
+			try (ResultSet rs = ps.getGeneratedKeys()) {
+				if (rs.next()) {
+					int id = rs.getInt(1);
+					logger.info("Plan inséré avec ID :" +id);
+					return new Plan(id, obj.getFichier());
+				}
+			}
+		} catch (Exception e) {
+			factory.dispatchException(e, "insert Plan" + obj.getFichier());
+		}
+		return obj;
+	}
+}
