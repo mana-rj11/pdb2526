@@ -12,6 +12,7 @@ public class FBDAOFactory extends DAOFactory {
 	private ITypePieceDao daoTypePiece = null;
 	private ISvgDao daoSvg = null;
 	private IPieceDao daoPiece = null;
+	private IAppareilDao daoAppareil = null;
 
 	public FBDAOFactory(Connection connexion) {
 		this.connexion = connexion;
@@ -35,6 +36,13 @@ public class FBDAOFactory extends DAOFactory {
 		if (daoSvg == null)
 			daoSvg = new CacheSvgDao(new SQLSvgDao(this));
 		return daoSvg;
+	}
+	
+	@Override
+	public IAppareilDao getAppareilDAO() {
+		if (daoAppareil == null) 
+			daoAppareil = new CacheAppareilDao(new SQLAppareilDao(this));
+		return daoAppareil;
 	}
 
 	@Override
@@ -61,5 +69,4 @@ public class FBDAOFactory extends DAOFactory {
 		int j = erreur.indexOf("\"", i);
 		return erreur.substring(i, j - 4);
 	}
-
 }
