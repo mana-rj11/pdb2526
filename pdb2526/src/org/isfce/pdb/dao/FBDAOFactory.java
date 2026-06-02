@@ -58,22 +58,22 @@ public class FBDAOFactory extends DAOFactory {
 	
 	@Override
 	public IElementDao getElementDAO() {
-		if (daoInstallation == null)
-			daoInstallation = new SQLInstallationDao(this);
+		if (daoElement == null)
+			daoElement = new SQLElementDao(this);
 		return daoElement;
 	}
 	
 	@Override
 	public IPlanDao getPlanDAO() {
-		if (daoInstallation == null)
-			daoInstallation = new SQLInstallationDao(this);
+		if (daoPlan == null)
+			daoPlan = new SQLPlanDao(this);
 		return daoPlan;
 	}
 	
 	@Override
 	public ILocalisationDao getLocalisationDAO() {
-		if (daoInstallation == null)
-			daoInstallation = new SQLInstallationDao(this);
+		if (daoLocalisation == null)
+			daoLocalisation = new SQLLocalisationDao(this);
 		return daoLocalisation;
 	}
 
