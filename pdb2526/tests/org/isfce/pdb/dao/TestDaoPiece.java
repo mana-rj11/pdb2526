@@ -26,7 +26,7 @@ public class TestDaoPiece {
 	private static IPieceDao dao;
 	static TypePiece tp = new TypePiece("SALON", "Salon", false);
 	static Piece p = Piece.builder().id(1).nom("SALON").description("Salon principal")
-			.etage(new BigDecimal(0.0).setScale(1)).typePiece(tp).installation(3).build();
+			.etage(new BigDecimal(0.0).setScale(1)).typePiece(tp).installation(3).plan(1).build();
 
 	static Piece pn = Piece.builder().nom("SALON2").description("Salon principal2")
 			.etage(new BigDecimal(1.0).setScale(1)).typePiece(tp).installation(3).build();
@@ -66,5 +66,4 @@ public class TestDaoPiece {
 		//On ne peut pas sauver un objet avec un ID
 		assertThrows(AssertionError.class, ()->dao.insert(pn2));		
 	}
-
 }
