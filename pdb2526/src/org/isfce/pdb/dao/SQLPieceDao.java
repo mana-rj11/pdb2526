@@ -15,15 +15,15 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class SQLPieceDao implements IPieceDao {
 	private static String SQL_GET_FROM_ID = """
-			SELECT NOM_PIE, DESCRIPTION_PIE, ETAGE_PIE, FKTYPE_PIE,FKINSTALLATION_PIE
+			SELECT NOM_PIE, DESCRIPTION_PIE, ETAGE_PIE, FKTYPE_PIE, FKINSTALLATION_PIE, FKPLAN_PIE
 			FROM TPIECE WHERE NUM_PIE = ?
 			""";
 	private static String SQL_GET_LISTE = """
 
 			""";
 	private static String SQL_INSERT = """
-			INSERT INTO TPIECE (NOM_PIE, DESCRIPTION_PIE, ETAGE_PIE, FKTYPE_PIE, FKINSTALLATION_PIE)
-			VALUES (?,?,?,?,?)
+			INSERT INTO TPIECE (NOM_PIE, DESCRIPTION_PIE, ETAGE_PIE, FKTYPE_PIE, FKINSTALLATION_PIE, FKPLAN_PIE)
+			VALUES (?,?,?,?,?,?)
 			""";
 	private DAOFactory factory;
 	private Connection connexion;
@@ -50,6 +50,7 @@ public class SQLPieceDao implements IPieceDao {
 						.etage(rs.getBigDecimal("ETAGE_PIE").setScale(1))
 						.typePiece(tp)
 						.installation(rs.getInt("FKINSTALLATION_PIE"))
+						.plan((Integer) rs.getObject("FKPLAN_PIE"))
 						.build();
 //@formatter:on
 				log.debug("Une pièce est chargée: " + obj);
@@ -69,6 +70,7 @@ public class SQLPieceDao implements IPieceDao {
 			ps.setBigDecimal(3, obj.getEtage());
 			ps.setString(4, obj.getTypePiece().getCode());
 			ps.setInt(5, obj.getInstallation());
+			ps.setObject(6, obj.getPlan(), java.sql.Types.INTEGER);
 			int nb = ps.executeUpdate();
 			if (nb == 1) {
 				ResultSet rs = ps.getGeneratedKeys();
