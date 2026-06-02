@@ -13,6 +13,10 @@ public class FBDAOFactory extends DAOFactory {
 	private ISvgDao daoSvg = null;
 	private IPieceDao daoPiece = null;
 	private IAppareilDao daoAppareil = null;
+	private IInstallationDao daoInstallation = null;
+	private IElementDao daoElement = null;
+	private IPlanDao daoPlan = null;
+	private ILocalisationDao daoLocalisation = null;
 
 	public FBDAOFactory(Connection connexion) {
 		this.connexion = connexion;
@@ -43,6 +47,34 @@ public class FBDAOFactory extends DAOFactory {
 		if (daoAppareil == null) 
 			daoAppareil = new CacheAppareilDao(new SQLAppareilDao(this));
 		return daoAppareil;
+	}
+	
+	@Override
+	public IInstallationDao getInstallationDAO() {
+		if (daoInstallation == null)
+			daoInstallation = new SQLInstallationDao(this);
+		return daoInstallation;
+	}
+	
+	@Override
+	public IElementDao getElementDAO() {
+		if (daoInstallation == null)
+			daoInstallation = new SQLInstallationDao(this);
+		return daoElement;
+	}
+	
+	@Override
+	public IPlanDao getPlanDAO() {
+		if (daoInstallation == null)
+			daoInstallation = new SQLInstallationDao(this);
+		return daoPlan;
+	}
+	
+	@Override
+	public ILocalisationDao getLocalisationDAO() {
+		if (daoInstallation == null)
+			daoInstallation = new SQLInstallationDao(this);
+		return daoLocalisation;
 	}
 
 	@Override

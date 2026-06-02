@@ -24,6 +24,14 @@ public abstract class DAOFactory {
 	public abstract ISvgDao getSvgDao();
 	
 	public abstract IAppareilDao getAppareilDAO();
+	
+	public abstract IInstallationDao getInstallationDAO();
+	
+	public abstract IElementDao getElementDAO();
+	
+	public abstract IPlanDao getPlanDAO();
+	
+	public abstract ILocalisationDao getLocalisationDAO();
 
 	// Méthode statique que génère des fabriques concrètes
 	public static DAOFactory getDAOFactory(TypePersistance typeP, Connection connect) {
