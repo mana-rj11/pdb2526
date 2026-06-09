@@ -11,16 +11,21 @@ import org.isfce.pdb.dao.DAOFactory.TypePersistance;
 import org.isfce.pdb.databases.connexion.ConnexionFromFile;
 import org.isfce.pdb.databases.connexion.ConnexionSingleton;
 import org.isfce.pdb.databases.uri.Databases;
+import org.isfce.pdb.exceptions.InstallationException;
 import org.isfce.pdb.services.Facade;
+import org.isfce.pdb.view.bundle.I18N;
+import org.isfce.pdb.view.piece.VueListePiecesController;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
@@ -63,23 +68,18 @@ public class MainController extends Application {
 		Button bt1 = new Button("Charge une installation");
 		leftPane.getChildren().add(bt1);
 		// bt1 
-		bt1.setOnAction(ev -> {
+		bt1.setOnAction(this::actionChargeInstallation);
 			
-		});
 
 		// bt2 
-		Button bt2 = new Button("");
+		Button bt2 = new Button("Crée Piece");
 		leftPane.getChildren().add(bt2);
-		bt2.setOnAction(ev -> {
-			
-		});
+		bt2.setOnAction(this::actionCreePiece);
 
 		// 
-		Button bt3 = new Button("");
+		Button bt3 = new Button("Liste des pièces");
 		leftPane.getChildren().add(bt3);
-		bt3.setOnAction(ev -> {
-			
-		});
+		bt3.setOnAction(this::actionListePieces);
 
 		cp.setLeft(leftPane);
 
@@ -106,7 +106,7 @@ public class MainController extends Application {
 		stage.setY(50);
 
 		// Crée un loader pour charger la vue FXML
-		FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/piece/VuePiece.fxml"));
+		FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/isfce/pdb/view/piece/VuePiece.fxml"));
 
 		try {
 			bundle = ResourceBundle.getBundle("view.piece.bundle.VuePiece");
@@ -139,6 +139,48 @@ public class MainController extends Application {
 			showErreur("Impossible de charger la vue Piece: " + e.getMessage());
 		}
 		stage = null;
+	}
+	
+	public void showListePieces() {
+		// bundle 
+		ResourceBundle bundle;
+		// creer une stage 
+		Stage stage = new Stage();
+		// indiquer sa stage parent
+		stage.initOwner(mainStage);
+		// stage.initModality(Modality.APPLICATION_MODAL);
+		stage.setX(100);
+		stage.setY(50);
+		
+		// Creer un loader pour charger la vue FXML
+		FXMLLoader loader = new FXMLLoader(
+			getClass().getResource("/org/isfce/pdb/view/piece/VueListePieces.fxml"));
+		try {
+			bundle = I18N.getInstance().getGlobalBundle();
+			loader.setResources(bundle);
+			// Obtenir la traduction du titre dans la locale
+			stage.setTitle(bundle.getString("piece.liste.titre"));
+		} catch (Exception e) {
+			log.error("Impossible de charger le bundle VueListePieces : " + e.getMessage());
+			stage.setTitle("Vue Liste Pieces");
+		}
+		
+		try {
+			AnchorPane root = loader.load();
+			VueListePiecesController ctrl = loader.getController(); 
+			ctrl.setUp(this, stage);
+			Scene scene = new Scene(root);
+			scene.getStylesheets().add(
+				getClass().getResource("/org/isfce/pdb/view/css/pdb2526.css")
+					.toExternalForm());
+			stage.setScene(scene);
+			stage.show();
+		} catch (IOException e) {
+			log.error("Impossible de charger la vue ListePiece");
+			showErreur("Impossible de charger la vue ListePieces: " + e.getMessage());
+		}
+		stage = null;
+				
 	}
 
 
@@ -198,6 +240,29 @@ public class MainController extends Application {
 			Platform.exit();
 		}
 		return factory;
+	}
+	
+	public void actionChargeInstallation(ActionEvent event) {
+		TextInputDialog textI = new TextInputDialog();
+		textI.setHeaderText(I18N.getString("inst.id"));
+		textI.showAndWait().ifPresent(s -> {
+			try {
+				Integer i = Integer.parseInt(s);
+				facade.chargeInstallation(i);
+			} catch (InstallationException e) {
+				showErreur(e.getMessage());
+			} catch (NumberFormatException e2) {
+				showErreur("Doit être un entier");
+			}
+		});
+	}
+	
+	public void actionCreePiece(ActionEvent event) {
+		showAddPiece();
+	}
+	
+	public void actionListePieces(ActionEvent event) {
+		showListePieces();
 	}
 
 }
