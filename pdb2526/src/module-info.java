@@ -8,8 +8,10 @@ module pdb2526 {
 	requires java.base;
 	requires lombok;
 	
-	// opens org.isfce.pdb.view to javafx.fxml;
-	//opens org.isfce.pdb to org.junit.platform.commons;
+	opens org.isfce.pdb.controller to javafx.fxml, javafx.graphics;
+	opens org.isfce.pdb.view.piece to javafx.fxml,  javafx.graphics;
 
 	exports org.isfce.pdb;
+	exports org.isfce.pdb.controller;
+	exports org.isfce.pdb.view.piece to javafx.fxml, javafx.graphics;
 }
