@@ -7,7 +7,6 @@ import java.util.Optional;
 import java.util.logging.Logger;
 
 import org.isfce.pdb.exceptions.InstallationException;
-import org.isfce.pdb.model.LocID;
 import org.isfce.pdb.model.Localisation;
 
 /**
@@ -32,77 +31,77 @@ public class SQLLocalisationDao implements ILocalisationDao {
 	}
 	
 	@Override
-	public Optional<Localisation> getFromId(LocID id) throws InstallationException {
-		String sql = "SELECT * FROM TLOCALISATION WHERE FKELEMENT_LOC = ? AND FKPIECE_LOC = ?";
+	public Optional<Localisation> getFromId(int idElement) throws InstallationException {
+		String sql = "SELECT * FROM TLOCALISATION WHERE FKELEMENT_LOC = ?";
 		Connection connect = factory.getConnection();
 		try (PreparedStatement ps = connect.prepareStatement(sql)) {
-			ps.setInt(1, id.getIdElement());
-			ps.setInt(2, id.getIdPiece());
+			ps.setInt(1, idElement);
+			// ps.setInt(2, id.getIdPiece());
 			try (ResultSet rs = ps.executeQuery()) {
 				if (rs.next()) {
-					logger.info("Localisation trouvée : " + id);
+					logger.info("Localisation trouvée : " + idElement);
 					return Optional.of(mapResultSet(rs));
 				}
 				return Optional.empty();
 			}
 		} catch (Exception e) {
-			factory.dispatchException(e, "getFromId Localisation " + id);
+			factory.dispatchException(e, "getFromId Localisation " + idElement);
 			return Optional.empty();
 		}
 	}
 	
 	@Override
-	public Localisation insert(LocID id, Localisation obj) throws InstallationException {
-		String sql = "INSERT INTO TLOCALISATION (FKELEMENT_LOC, FKPIECE_LOC, X_LOC, Y_LOC, A_LOC) "
+	public Localisation insert(int idElement, int idPiece, Localisation obj) throws InstallationException {
+		String sql = "INSERT INTO TLOCALISATION " + "(FKELEMENT_LOC, FKPIECE_LOC, X_LOC, Y_LOC, A_LOC) "
 				   + "values (?, ?, ?, ?, ?)";
 		Connection connect = factory.getConnection();
 		try (PreparedStatement ps = connect.prepareStatement(sql)) {
-			ps.setInt(1, id.getIdElement());
-			ps.setInt(2, id.getIdPiece());
+			ps.setInt(1, idElement);
+			ps.setInt(2, idPiece);
 			ps.setDouble(3, obj.getX());
 			ps.setDouble(4, obj.getY());
 			ps.setDouble(5, obj.getA());
 			ps.executeUpdate();
-			logger.info("Localisation insérée : " + id);
+			logger.info("Localisation insérée : element=" + idElement + " piece=" + idPiece);
 			return obj;
 		} catch (Exception e) {
-			factory.dispatchException(e, "insert Localisation " + id);
+			factory.dispatchException(e, "insert Localisation " + idElement);
 			return obj;
 		}
 	}
 	
 	@Override
-	public boolean update(LocID id, Localisation obj) throws InstallationException {
-		String sql = "UPDATE TLOCALISATION SET X_LOC = ?, T_LOC = ?, A_LOC = ? "
-				   + "WHERE FKELEMENT_LOC = ? AND FKPIECE_LOC = ?";
+	public boolean update(int idElement, Localisation obj) throws InstallationException {
+		String sql = "UPDATE TLOCALISATION " + "SET X_LOC = ?, Y_LOC = ?, A_LOC = ? "
+				   + "WHERE FKELEMENT_LOC = ?";
 		Connection connect = factory.getConnection();
 		try (PreparedStatement ps = connect.prepareStatement(sql)) {
 			ps.setDouble(1, obj.getX());
 			ps.setDouble(2, obj.getY());
 			ps.setDouble(3, obj.getA());
-			ps.setInt(4, id.getIdElement());
-			ps.setInt(5, id.getIdPiece());
+			ps.setInt(4, idElement);
+			// ps.setInt(5, id.getIdPiece());
 			int rows = ps.executeUpdate();
-			logger.info("Localisation mise à jour : " + id);
+			logger.info("Localisation mise à jour : " + idElement);
 			return rows > 0;
 		} catch (Exception e) {
-			factory.dispatchException(e, "update Localisation" + id);
+			factory.dispatchException(e, "update Localisation" + idElement);
 			return false;
 		}
 	}
 	
 	@Override
-	public boolean delete(LocID id) throws InstallationException {
-		String sql = "DELETE FROM TLOCALISATION FKELEMENT_LOC = ? AND FKPIECE_LOC = ?";
+	public boolean delete(int idElement) throws InstallationException {
+		String sql = "DELETE FROM TLOCALISATION WHERE FKELEMENT_LOC = ?";
 		Connection connect = factory.getConnection();
 		try (PreparedStatement ps = connect.prepareStatement(sql)) {
-			ps.setInt(1, id.getIdElement());
-			ps.setInt(2, id.getIdPiece());
+			ps.setInt(1, idElement);
+			// ps.setInt(2, id.getIdPiece());
 			int rows = ps.executeUpdate();
-			logger.info("Localisation supprimée : " + id);
+			logger.info("Localisation supprimée : " + idElement);
 			return rows > 0;
 		} catch (Exception e) {
-			factory.dispatchException(e, "delete Localisation"+ id);
+			factory.dispatchException(e, "delete Localisation"+ idElement);
 			return false;
 		}
 	}

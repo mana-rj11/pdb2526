@@ -3,7 +3,6 @@ package org.isfce.pdb.dao;
 import java.util.Optional;
 
 import org.isfce.pdb.exceptions.InstallationException;
-import org.isfce.pdb.model.LocID;
 import org.isfce.pdb.model.Localisation;
 
 
@@ -15,12 +14,12 @@ import org.isfce.pdb.model.Localisation;
 public interface ILocalisationDao {
 	
 	
-	Optional<Localisation> getFromId(LocID id) throws InstallationException;
+	Optional<Localisation> getFromId(int idElement) throws InstallationException;
 	
-	Localisation insert(LocID id, Localisation obj) throws InstallationException;
+	Localisation insert(int idElement, int idPiece, Localisation obj) throws InstallationException;
 	
-	boolean update(LocID id, Localisation obj) throws InstallationException;
+	boolean update(int idElement, Localisation obj) throws InstallationException;
 	
-	boolean delete(LocID id) throws InstallationException;
+	boolean delete(int idElement) throws InstallationException;
 }
 
