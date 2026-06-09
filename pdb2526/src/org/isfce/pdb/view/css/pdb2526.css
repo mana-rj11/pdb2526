@@ -1,0 +1,34 @@
+.titre{
+    -fx-text-alignment : center ;
+    -fx-alignment : center;
+    -fx-font: 20.0px 'Georgia';
+    -fx-background-color: #4FC3F7;
+    -fx-padding: 10.0;
+}
+.main-label{
+    -fx-font: 15.0px 'Georgia';
+    -fx-background-color: #81D4FA;
+    -fx-padding: 5.0
+}
+.main-text-field{
+    -fx-font: 15.0px 'Georgia';
+    -fx-background-color: lightgrey;
+    -fx-padding: 5.0
+}
+.button{
+    -fx-font: 15.0px 'Georgia';
+}
+.button:armed{
+    -fx-background-color: #4CAF50
+}
+.button:hover{
+    -fx-border-color: #2E7D32 
+}
+.text-field:error{
+    -fx-background-color: orange;
+    -fx-border-color: red;
+}
+.combo-box:error{
+    -fx-background-color: orange;
+    -fx-border-color: red;
+}
