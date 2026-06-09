@@ -1,10 +1,13 @@
 package org.isfce.pdb.services;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
 import org.isfce.pdb.dao.DAOFactory;
 import org.isfce.pdb.exceptions.InstallationException;
+import org.isfce.pdb.model.Adresse;
 import org.isfce.pdb.model.Element;
 import org.isfce.pdb.model.Installation;
 import org.isfce.pdb.model.LocID;
@@ -12,6 +15,7 @@ import org.isfce.pdb.model.Localisation;
 import org.isfce.pdb.model.Piece;
 import org.isfce.pdb.model.Plan;
 import org.isfce.pdb.model.TypePiece;
+import org.isfce.pdb.view.bundle.I18N;
 
 public class Facade {
 	
@@ -20,7 +24,7 @@ public class Facade {
 	private DAOFactory factory;
 	private Installation installation;
 	//pièces de l'installation
-	private List<Piece> pieces;
+	private List<Piece> pieces = new ArrayList<Piece>();
 	//élements de l'installation
 	private List<Element> elements;
 
@@ -37,17 +41,27 @@ public class Facade {
 	 */
 	
 	public void chargeInstallation(int id) throws InstallationException {
-		installation = factory.getInstallationDAO()
-				.getFromId(id)
-				.orElseThrow(() -> new InstallationException("Installation introuvable : " + id));
-		pieces = factory.getPieceDAO().getListe(null);
-		elements = factory.getElementDAO().getListeFromInstallation(id);
-		logger.info("Installation chargée : " + id
-				+ " | pièces : " + pieces.size()
-				+ " | éléments : " + elements.size());
+		if (id == 1) {
+			installation = Installation.builder()
+					.adresse(new Adresse("Rue J buedts", 1040, "Etterbeek"))
+					.date(LocalDate.of(2026, 5, 12))
+					.id(1)
+					.Installateur("moi")
+					.proprietaire("truc").build();
+				// .getFromId(id)
+			//.orElseThrow(() -> new InstallationException("Installation introuvable : " + id));
+			//pieces = factory.getPieceDAO().getListe(null);
+			//elements = factory.getElementDAO().getListeFromInstallation(id);
+			//logger.info("Installation chargée : " + id
+			//	+ " | pièces : " + pieces.size()
+			//	+ " | éléments : " + elements.size());
+		} else 
+			throw new InstallationException(I18N.getString("err.noInstall"));
 	}
 	
-	public Installation getInstallation() {
+	public Installation getCurrentInstallation() throws InstallationException {
+		if (installation == null)
+			throw new InstallationException(I18N.getString("err.noInstall"));
 		return installation;
 	}
 	
@@ -66,23 +80,20 @@ public class Facade {
 	// Pièces 
 	// -----------------------------------------------------------
 	
-	public List<Piece> getPieces() {
+	public List<Piece> getListePieces() {
 		return pieces;
 	}
 	
 	/**
 	 * Ajoute une pièce à l'installation courante 
 	 */
-	public Piece addPiece(Piece piece) throws InstallationException {
+	public void insertPiece(Piece piece) throws InstallationException {
 		try {
-			Piece created = factory.getPieceDAO().insert(piece);
-			pieces.add(created);
-			logger.info("Pièce ajoutée : " + created.getNom());
-			return created;
-		} catch (InstallationException e) {
-			throw e;
+			factory.getPieceDAO().insert(piece);
+			pieces.add(piece);
 		} catch (Exception e) {
-			throw new InstallationException("Erreur ajout pièce : " + e.getMessage());
+			if (e instanceof InstallationException exception)
+				throw exception;
 		}
 		
 	}
