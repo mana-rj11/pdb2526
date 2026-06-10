@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 import org.isfce.pdb.exceptions.CheckException;
+import org.isfce.pdb.exceptions.FKException;
 import org.isfce.pdb.exceptions.InstallationException;
 import org.isfce.pdb.exceptions.PKException;
 
@@ -89,9 +90,25 @@ public class FBDAOFactory extends DAOFactory {
 		throw switch (exc.getErrorCode()) {
 		case 335544665 -> new PKException(e.getMessage(), detail);
 		case 335544347 -> new CheckException(e.getMessage(), detail);
-
+		case 335544466 -> {
+			String txt;
+			String err;
+			if (detail.startsWith("[DEl]")) {
+				err = "err.supression.impossible";
+				txt = detail.substring(5);
+			} else if (detail.startsWith("[INS]")) {
+				err = "err.insertion.impossible";
+				txt = detail.substring(5);
+			} else if (detail.startsWith("[UPD]")) {
+				err = "err.mise_a_jour.impossible";
+				txt = detail.substring(5);
+			} else {
+				err = "err.insertion.impossible";
+				txt = detail;
+			}
+			yield new FKException(err, txt);
+		}
 		default -> new InstallationException(" Problème "+exc);
-
 		};
 
 	}
