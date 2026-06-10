@@ -15,11 +15,15 @@ import org.isfce.pdb.exceptions.InstallationException;
 import org.isfce.pdb.services.Facade;
 import org.isfce.pdb.view.bundle.I18N;
 import org.isfce.pdb.view.piece.VueListePiecesController;
+import org.isfce.pdb.view.piece.VuePieceController;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -43,6 +47,9 @@ public class MainController extends Application {
 
 //MainStage
 	private Stage mainStage;
+	
+// property pour savoir si une installation est chargée
+	private BooleanProperty installationChargee = new SimpleBooleanProperty(false);
 
 //Lancement de l'application
 	@Override
@@ -65,21 +72,29 @@ public class MainController extends Application {
 
 		// Liste de boutons
 		VBox leftPane = new VBox();
+		leftPane.setFillWidth(true);
+		leftPane.setPadding(new Insets(10));
+		
 		Button bt1 = new Button("Charge une installation");
 		leftPane.getChildren().add(bt1);
 		// bt1 
 		bt1.setOnAction(this::actionChargeInstallation);
+		bt1.setMaxWidth(Double.MAX_VALUE);
 			
 
 		// bt2 
-		Button bt2 = new Button("Crée Piece");
+		Button bt2 = new Button(I18N.getString("bt.crée.piece"));
 		leftPane.getChildren().add(bt2);
 		bt2.setOnAction(this::actionCreePiece);
+		bt2.setMaxWidth(Double.MAX_VALUE);
+		bt2.disableProperty().bind(installationChargee.not());
 
 		// 
-		Button bt3 = new Button("Liste des pièces");
+		Button bt3 = new Button(I18N.getString("bt.liste.piece"));
 		leftPane.getChildren().add(bt3);
 		bt3.setOnAction(this::actionListePieces);
+		bt3.setMaxWidth(Double.MAX_VALUE);
+		bt3.disableProperty().bind(installationChargee.not());
 
 		cp.setLeft(leftPane);
 
@@ -96,7 +111,7 @@ public class MainController extends Application {
 	 */
 	private void showAddPiece() {
 		// bundle
-		ResourceBundle bundle;
+		// ResourceBundle bundle;
 		// Crée une stage
 		Stage stage = new Stage();
 		// indique sa stage parent
@@ -109,20 +124,22 @@ public class MainController extends Application {
 		FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/isfce/pdb/view/piece/VuePiece.fxml"));
 
 		try {
-			bundle = ResourceBundle.getBundle("view.piece.bundle.VuePiece");
+			ResourceBundle bundle = I18N.getInstance().getGlobalBundle();
 			loader.setResources(bundle);
 			// Obtenir la traduction du titre dans la locale
-			stage.setTitle(bundle.getString("titre"));
+			stage.setTitle(bundle.getString("piece.titre"));
 		} catch (Exception e) {
-			log.error("Imposible de charger le buddle pour la vue Piece" + e.getMessage());
-			showErreur("Impossible de charger le buddle ");
+			log.error("Imposible de charger le bundle pour la VuePiece" + e.getMessage());
+			// showErreur("Impossible de charger le buddle ");
 			stage.setTitle("Vue Piece");
 		}
 		// Charge la vue à partir du Loader
 		// et initialise son contenu en appelant la méthode setUp du controleur
-		AnchorPane root;
+
 		try {
-			root = loader.load();
+			AnchorPane root = loader.load();
+			VuePieceController ctrl = loader.getController();
+			ctrl.setUp(this, stage);
 			/*
 			// récupère le ctrl (après l'initialisation)
 			VuePieceController ctrl = loader.getController();
@@ -131,7 +148,7 @@ public class MainController extends Application {
 			*/
 			// charge le Pane dans la Stage
 			Scene scene = new Scene(root);
-			scene.getStylesheets().add("./view/css/pdb2526.css");
+			scene.getStylesheets().add(getClass().getResource("./view/css/pdb2526.css").toExternalForm());
 			stage.setScene(scene);
 			stage.showAndWait();
 		} catch (IOException e) {
@@ -143,7 +160,7 @@ public class MainController extends Application {
 	
 	public void showListePieces() {
 		// bundle 
-		ResourceBundle bundle;
+		// ResourceBundle bundle;
 		// creer une stage 
 		Stage stage = new Stage();
 		// indiquer sa stage parent
@@ -156,7 +173,7 @@ public class MainController extends Application {
 		FXMLLoader loader = new FXMLLoader(
 			getClass().getResource("/org/isfce/pdb/view/piece/VueListePieces.fxml"));
 		try {
-			bundle = I18N.getInstance().getGlobalBundle();
+			ResourceBundle bundle = I18N.getInstance().getGlobalBundle();
 			loader.setResources(bundle);
 			// Obtenir la traduction du titre dans la locale
 			stage.setTitle(bundle.getString("piece.liste.titre"));
@@ -243,12 +260,13 @@ public class MainController extends Application {
 	}
 	
 	public void actionChargeInstallation(ActionEvent event) {
-		TextInputDialog textI = new TextInputDialog();
+		TextInputDialog textI = new TextInputDialog("1");
 		textI.setHeaderText(I18N.getString("inst.id"));
 		textI.showAndWait().ifPresent(s -> {
 			try {
 				Integer i = Integer.parseInt(s);
 				facade.chargeInstallation(i);
+				installationChargee.set(true);
 			} catch (InstallationException e) {
 				showErreur(e.getMessage());
 			} catch (NumberFormatException e2) {
