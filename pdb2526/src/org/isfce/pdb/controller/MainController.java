@@ -1,6 +1,7 @@
 package org.isfce.pdb.controller;
 
 import java.io.IOException;
+import java.net.URL;
 import java.sql.Connection;
 import java.util.Locale;
 import java.util.Optional;
@@ -83,7 +84,7 @@ public class MainController extends Application {
 			
 
 		// bt2 
-		Button bt2 = new Button(I18N.getString("bt.crée.piece"));
+		Button bt2 = new Button(I18N.getString("bt.cree.piece"));
 		leftPane.getChildren().add(bt2);
 		bt2.setOnAction(this::actionCreePiece);
 		bt2.setMaxWidth(Double.MAX_VALUE);
@@ -148,7 +149,9 @@ public class MainController extends Application {
 			*/
 			// charge le Pane dans la Stage
 			Scene scene = new Scene(root);
-			scene.getStylesheets().add(getClass().getResource("./view/css/pdb2526.css").toExternalForm());
+			URL cssUrl = getClass().getResource("/org/isfce/pdb/view/css/pdb2526.css");
+			if (cssUrl != null) scene.getStylesheets().add(cssUrl.toExternalForm());
+			// scene.getStylesheets().add(getClass().getResource("./view/css/pdb2526.css").toExternalForm());
 			stage.setScene(scene);
 			stage.showAndWait();
 		} catch (IOException e) {
@@ -187,9 +190,9 @@ public class MainController extends Application {
 			VueListePiecesController ctrl = loader.getController(); 
 			ctrl.setUp(this, stage);
 			Scene scene = new Scene(root);
-			scene.getStylesheets().add(
-				getClass().getResource("/org/isfce/pdb/view/css/pdb2526.css")
-					.toExternalForm());
+			URL cssUrl = getClass().getResource("/org/isfce/pdb/view/css/pdb2526.css");
+			if (cssUrl != null) scene.getStylesheets().add(cssUrl.toExternalForm());
+			// scene.getStylesheets().add(getClass().getResource("/org/isfce/pdb/view/css/pdb2526.css").toExternalForm());
 			stage.setScene(scene);
 			stage.show();
 		} catch (IOException e) {
