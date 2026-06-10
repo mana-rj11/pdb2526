@@ -1,32 +1,27 @@
 package org.isfce.pdb.services;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
+import java.util.Optional;
 
 import org.isfce.pdb.dao.DAOFactory;
 import org.isfce.pdb.exceptions.InstallationException;
 import org.isfce.pdb.model.Adresse;
-import org.isfce.pdb.model.Element;
 import org.isfce.pdb.model.Installation;
-import org.isfce.pdb.model.LocID;
-import org.isfce.pdb.model.Localisation;
 import org.isfce.pdb.model.Piece;
-import org.isfce.pdb.model.Plan;
 import org.isfce.pdb.model.TypePiece;
 import org.isfce.pdb.view.bundle.I18N;
 
 public class Facade {
 	
-	private static final Logger logger = Logger.getLogger(Facade.class.getName());
+	// private static final Logger logger = Logger.getLogger(Facade.class.getName());
 
 	private DAOFactory factory;
 	private Installation installation;
-	//pièces de l'installation
-	private List<Piece> pieces = new ArrayList<Piece>();
-	//élements de l'installation
-	private List<Element> elements;
+	// pièces de l'installation
+	// private List<Piece> pieces = new ArrayList<Piece>();
+	// élements de l'installation
+	// private List<Element> elements;
 
 	public Facade(DAOFactory factory) {
 		this.factory=factory;
@@ -56,8 +51,14 @@ public class Facade {
 			//	+ " | pièces : " + pieces.size()
 			//	+ " | éléments : " + elements.size());
 		} else 
-			throw new InstallationException(I18N.getString("err.noInstall"));
+			throw new InstallationException(I18N.getString("err.install.inconnue"));
 	}
+	
+	/**
+	 * Retourne l'installation courante
+	 * @return installtion
+	 * @throws InstallationException
+	 */
 	
 	public Installation getCurrentInstallation() throws InstallationException {
 		if (installation == null)
@@ -76,21 +77,13 @@ public class Facade {
 		return factory.getTypePieceDAO().getListe(null);
 	}
 	
-	// -----------------------------------------------------------
-	// Pièces 
-	// -----------------------------------------------------------
-	
-	public List<Piece> getListePieces() {
-		return pieces;
-	}
-	
 	/**
-	 * Ajoute une pièce à l'installation courante 
+	 * Ajoute d'une nouvelle pièce  
 	 */
 	public void insertPiece(Piece piece) throws InstallationException {
 		try {
 			factory.getPieceDAO().insert(piece);
-			pieces.add(piece);
+			// pieces.add(piece);
 		} catch (Exception e) {
 			if (e instanceof InstallationException exception)
 				throw exception;
@@ -99,53 +92,51 @@ public class Facade {
 	}
 	
 	// -----------------------------------------------------------
-	// Eléments
+	// Pièces 
 	// -----------------------------------------------------------
 	
-	public List<Element> getElements() {
-		return elements;
-	}
-	
-	// -----------------------------------------------------------
-	// Plans
-	// -----------------------------------------------------------
-	
-	/**
-	 * Retourne tous les plans de l'utilisation courante
-	 */
-	public List<Plan> getPlans() throws InstallationException {
-		return factory.getPlanDAO()
-				.getListePlanFromInstallation(installation.getId());
+	public List<Piece> getListePieces() {
+		if (installation != null) 
+			return factory.getPieceDAO().getListeFromInstallation(installation.getId());	
+		else
+			return List.of();	
 	}
 	
 	/**
-	 * Ajoute un plan à l'utilisation courante
+	 * Suppression d'une pièce
+	 * 
 	 */
-	public Plan addPlan(String nomFichier) throws InstallationException {
-		Plan plan = new Plan(0, nomFichier);
-		return factory.getPlanDAO().insert(plan);
+	public boolean deletePiece(Piece obj) throws InstallationException {
+		boolean ok = false;
+		try {
+			ok = factory.getPieceDAO().delete(obj);
+		} catch (Exception e) {
+			if (e instanceof InstallationException exc)
+				throw exc;
+		}
+		return ok;
 	}
 	
-	// -----------------------------------------------------------
-	// Localisation
-	// -----------------------------------------------------------
-	
-	public Localisation getLocalisation(LocID id) throws InstallationException {
-		return factory.getLocalisationDAO()
-				.getFromId(id)
-				.orElse(null);
+	/**
+	 * Mise à jour d'une pièce
+	 */
+	public boolean updatePiece(Piece piece) throws InstallationException {
+		boolean ok = false;
+		try {
+			ok = factory.getPieceDAO().update(piece);
+		} catch (Exception e) {
+			if (e instanceof InstallationException exc)
+				throw exc;
+		}
+		return ok;
 	}
 	
-	public Localisation addLocalisation(LocID id, Localisation loc) throws InstallationException {
-		return factory.getLocalisationDAO().insert(id, loc);
+	/**
+	 * Charge une pièce par son id
+	 */
+	public Optional<Piece> getPiece(Integer id) {
+		return factory.getPieceDAO().getFromID(id);
 	}
 	
-	public boolean updateLocalisation(LocID id, Localisation loc) throws InstallationException {
-		return factory.getLocalisationDAO().update(id, loc);
-	}
 	
-	public boolean deleteLocalisation(LocID id) throws InstallationException {
-		return factory.getLocalisationDAO().delete(id);
-	}
-
 }
