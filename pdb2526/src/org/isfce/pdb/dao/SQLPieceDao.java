@@ -25,7 +25,7 @@ public class SQLPieceDao implements IPieceDao {
 			""";
 	
 	private static String SQL_GET_LISTE_FROM_INST = """
-			SELECT NUM_PIE, NOM_PIE, DESCRIPTION_PIE, ETAGE_PIE, FKTYPE_PIE
+			SELECT NUM_PIE, NOM_PIE, DESCRIPTION_PIE, ETAGE_PIE, FKTYPE_PIE, FKPLAN_PIE
 			FROM TPIECE WHERE FKINSTALLATION_PIE=? ORDER BY ETAGE_PIE,FKTYPE_PIE
 			""";
 	
@@ -106,7 +106,7 @@ public class SQLPieceDao implements IPieceDao {
 				liste.add(obj);
 			}
 		} catch (SQLException | InstallationException e) {
-			log.error("Problème lors du chargement de la liste des Pièces");
+			log.error("Problème lors du chargement de la liste des Pièces" + e.getMessage(), e);
 		}
 		return liste;
 	}
