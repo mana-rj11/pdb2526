@@ -9,7 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.isfce.pdb.exceptions.InstallationException;
 import org.isfce.pdb.model.Piece;
+import org.isfce.pdb.model.Plan;
 import org.isfce.pdb.model.TypePiece;
 
 import lombok.extern.slf4j.Slf4j;
@@ -59,6 +61,9 @@ public class SQLPieceDao implements IPieceDao {
 				String typeP = rs.getString("FKTYPE_PIE");
 				TypePiece tp = factory.getTypePieceDAO().getFromID(typeP).get();// A corriger
 //@formatter:off 
+				
+				Plan plan = resolvePlan((Integer) rs.getObject("FKPLAN_PIE"));
+				
 				obj = Piece.builder()
 						.id(id)
 						.nom(rs.getString("NOM_PIE"))
@@ -66,12 +71,12 @@ public class SQLPieceDao implements IPieceDao {
 						.etage(rs.getBigDecimal("ETAGE_PIE").setScale(1))
 						.typePiece(tp)
 						.installation(rs.getInt("FKINSTALLATION_PIE"))
-						.plan((Integer) rs.getObject("FKPLAN_PIE"))
+						.plan(plan)
 						.build();
 //@formatter:on
 				log.debug("Une pièce est chargée: " + obj);
 			}
-		} catch (SQLException e) {
+		} catch (SQLException | InstallationException e) {
 			log.error(e.getMessage());
 		}
 		return Optional.ofNullable(obj);
@@ -86,6 +91,9 @@ public class SQLPieceDao implements IPieceDao {
 			while (rs.next()) {
 				String typeP = rs.getString("FKTYPE_PIE");
 				TypePiece tp = factory.getTypePieceDAO().getFromID(typeP).get();
+				
+				Plan plan = resolvePlan((Integer) rs.getObject("FKPLAN_PIE"));
+				
 				Piece obj = Piece.builder()
 						.id(rs.getInt("NUM_PIE"))
 						.nom(rs.getString("NOM_PIE"))
@@ -93,13 +101,23 @@ public class SQLPieceDao implements IPieceDao {
 						.etage(rs.getBigDecimal("ETAGE_PIE").setScale(1))
 						.typePiece(tp)
 						.installation(installation)
+						.plan(plan)
 						.build();
 				liste.add(obj);
 			}
-		} catch (SQLException e) {
+		} catch (SQLException | InstallationException e) {
 			log.error("Problème lors du chargement de la liste des Pièces");
 		}
 		return liste;
+	}
+	
+	/**
+	 * Résout l'id de plan (FK nullable) en objet Plan complet
+	 */
+	private Plan resolvePlan(Integer fkPlan) throws InstallationException {
+		if (fkPlan == null)
+			return null;
+		return factory.getPlanDAO().getFromId(fkPlan).orElse(null);
 	}
 
 	@Override
@@ -111,7 +129,8 @@ public class SQLPieceDao implements IPieceDao {
 			ps.setBigDecimal(3, obj.getEtage());
 			ps.setString(4, obj.getTypePiece().getCode());
 			ps.setInt(5, obj.getInstallation());
-			ps.setObject(6, obj.getPlan(), java.sql.Types.INTEGER);
+			Integer idPlan = obj.getPlan() != null ? obj.getPlan().getId() : null;
+			ps.setObject(6, idPlan, java.sql.Types.INTEGER);
 			int nb = ps.executeUpdate();
 			if (nb == 1) {
 				ResultSet rs = ps.getGeneratedKeys();
@@ -127,7 +146,7 @@ public class SQLPieceDao implements IPieceDao {
 			log.error("Insertion non validée: " + e);
 			if (!this.connexion.getAutoCommit())
 				this.connexion.rollback();
-			this.factory.dispatchException(e, "PIECE");
+			this.factory.dispatchException(e, "[INS] PIECE");
 		}
 		return obj;
 	}

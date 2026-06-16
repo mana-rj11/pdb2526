@@ -1,6 +1,7 @@
 package org.isfce.pdb.dao;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.isfce.pdb.exceptions.InstallationException;
 import org.isfce.pdb.model.Plan;
@@ -12,7 +13,9 @@ import org.isfce.pdb.model.Plan;
  */
 public interface IPlanDao {
 	
+	Optional<Plan> getFromId(int d) throws InstallationException;
+	
 	List<Plan> getListePlanFromInstallation(int installation) throws InstallationException;
 	
-	Plan insert(Plan obj) throws InstallationException;
+	Plan insert(Plan obj, int installation) throws InstallationException;
 }

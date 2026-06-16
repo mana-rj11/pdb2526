@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Logger;
 
 import org.isfce.pdb.exceptions.InstallationException;
@@ -30,6 +31,25 @@ public class SQLPlanDao implements IPlanDao {
 	}
 	
 	@Override
+	public Optional<Plan> getFromId(int id) throws InstallationException{
+		String sql = "SELECT * FROM TPLAN WHERE ID_PLA = ?";
+		Connection connect = factory.getConnection();
+		try (PreparedStatement ps = connect.prepareStatement(sql)) {
+			ps.setInt(1, id);
+			try (ResultSet rs = ps.executeQuery()) {
+				if (rs.next()) {
+					logger.info("Plan trouvé : " + id);
+					return Optional.of(mapResultSet(rs));
+				}
+				return Optional.empty();
+			}
+		} catch (Exception e) {
+			factory.dispatchException(e, "getFromId Plan " + id);
+			return Optional.empty();
+		}
+	}
+	
+	@Override
 	public List<Plan> getListePlanFromInstallation(int installation) throws InstallationException {
 		String sql = "SELECT * FROM TPLAN WHERE FKINSTALLATION_PLA = ?";
 		Connection connect = factory.getConnection();
@@ -50,7 +70,7 @@ public class SQLPlanDao implements IPlanDao {
 	
 
 	@Override
-	public Plan insert(Plan obj) throws InstallationException {
+	public Plan insert(Plan obj, int installation) throws InstallationException {
 		String sql = "INSERT INTO PLAN (NOM_PLA, FKINSTALLATION_PLA) VALUES (?, ?)";
 		Connection connect = factory.getConnection();
 		try (PreparedStatement ps = connect.prepareStatement(sql,
