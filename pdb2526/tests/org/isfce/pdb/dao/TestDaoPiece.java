@@ -13,6 +13,7 @@ import org.isfce.pdb.databases.connexion.ConnexionFromFile;
 import org.isfce.pdb.databases.connexion.ConnexionSingleton;
 import org.isfce.pdb.databases.uri.Databases;
 import org.isfce.pdb.model.Piece;
+import org.isfce.pdb.model.Plan;
 import org.isfce.pdb.model.TypePiece;
 import org.isfce.pdb.util.DatabaseUtil;
 import org.junit.jupiter.api.AfterAll;
@@ -25,8 +26,9 @@ public class TestDaoPiece {
 
 	private static IPieceDao dao;
 	static TypePiece tp = new TypePiece("SALON", "Salon", false);
+	static Plan plan1 = new Plan(1, "Rez de chaussé");
 	static Piece p = Piece.builder().id(1).nom("SALON").description("Salon principal")
-			.etage(new BigDecimal(0.0).setScale(1)).typePiece(tp).installation(3).plan(1).build();
+			.etage(new BigDecimal(0.0).setScale(1)).typePiece(tp).installation(3).plan(plan1).build();
 
 	static Piece pn = Piece.builder().nom("SALON2").description("Salon principal2")
 			.etage(new BigDecimal(1.0).setScale(1)).typePiece(tp).installation(3).build();
