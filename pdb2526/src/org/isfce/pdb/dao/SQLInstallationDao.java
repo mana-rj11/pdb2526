@@ -31,7 +31,7 @@ public class SQLInstallationDao implements IInstallationDao {
 		return Installation.builder()
 			.id(rs.getInt("NUM_INS"))
 			.date(rs.getDate("DATE_INS").toLocalDate())
-			.Installateur(rs.getString("INSTALLATEUR"))
+			.Installateur(rs.getString("INSTALLATEUR_INS"))
 			.proprietaire(rs.getString("PROPRIETAIRE_INS"))
 			.adresse(adresse)
 			.build();
