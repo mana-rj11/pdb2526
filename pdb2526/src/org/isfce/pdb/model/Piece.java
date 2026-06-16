@@ -19,5 +19,5 @@ public class Piece {
 	private BigDecimal etage;
 	private TypePiece typePiece;
 	private final Integer installation;
-	private Integer plan;
+	private Plan plan;
 }
