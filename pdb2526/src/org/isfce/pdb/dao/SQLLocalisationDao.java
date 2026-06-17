@@ -26,7 +26,8 @@ public class SQLLocalisationDao implements ILocalisationDao {
 		return new Localisation(
 			rs.getDouble("X_LOC"),
 			rs.getDouble("Y_LOC"),
-			rs.getDouble("A_LOC")
+			rs.getDouble("A_LOC"), 
+			rs.getBoolean("PLACE_LOC")
 		);
 	}
 	
@@ -52,7 +53,7 @@ public class SQLLocalisationDao implements ILocalisationDao {
 	
 	@Override
 	public Localisation insert(int idElement, int idPiece, Localisation obj) throws InstallationException {
-		String sql = "INSERT INTO TLOCALISATION " + "(FKELEMENT_LOC, FKPIECE_LOC, X_LOC, Y_LOC, A_LOC) "
+		String sql = "INSERT INTO TLOCALISATION " + "(FKELEMENT_LOC, FKPIECE_LOC, X_LOC, Y_LOC, A_LOC, PLACE_LOC) "
 				   + "values (?, ?, ?, ?, ?)";
 		Connection connect = factory.getConnection();
 		try (PreparedStatement ps = connect.prepareStatement(sql)) {
@@ -61,6 +62,7 @@ public class SQLLocalisationDao implements ILocalisationDao {
 			ps.setDouble(3, obj.getX());
 			ps.setDouble(4, obj.getY());
 			ps.setDouble(5, obj.getA());
+			ps.setBoolean(6, obj.isPlace());
 			ps.executeUpdate();
 			logger.info("Localisation insérée : element=" + idElement + " piece=" + idPiece);
 			return obj;
@@ -72,15 +74,16 @@ public class SQLLocalisationDao implements ILocalisationDao {
 	
 	@Override
 	public boolean update(int idElement, Localisation obj) throws InstallationException {
-		String sql = "UPDATE TLOCALISATION " + "SET X_LOC = ?, Y_LOC = ?, A_LOC = ? "
+		String sql = "UPDATE TLOCALISATION " + "SET X_LOC = ?, Y_LOC = ?, A_LOC = ?, PLACE_LOC = ? "
 				   + "WHERE FKELEMENT_LOC = ?";
 		Connection connect = factory.getConnection();
 		try (PreparedStatement ps = connect.prepareStatement(sql)) {
 			ps.setDouble(1, obj.getX());
 			ps.setDouble(2, obj.getY());
 			ps.setDouble(3, obj.getA());
-			ps.setInt(4, idElement);
-			// ps.setInt(5, id.getIdPiece());
+			ps.setBoolean(4, obj.isPlace());
+			ps.setInt(5, idElement);
+			// ps.setInt(6, id.getIdPiece());
 			int rows = ps.executeUpdate();
 			logger.info("Localisation mise à jour : " + idElement);
 			return rows > 0;
