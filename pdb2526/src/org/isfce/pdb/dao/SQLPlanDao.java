@@ -3,6 +3,7 @@ package org.isfce.pdb.dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -71,22 +72,22 @@ public class SQLPlanDao implements IPlanDao {
 
 	@Override
 	public Plan insert(Plan obj, int installation) throws InstallationException {
-		String sql = "INSERT INTO PLAN (NOM_PLA, FKINSTALLATION_PLA) VALUES (?, ?)";
+		String sql = "INSERT INTO TPLAN (NOM_PLA, FKINSTALLATION_PLA) VALUES (?, ?)";
 		Connection connect = factory.getConnection();
 		try (PreparedStatement ps = connect.prepareStatement(sql,
-				java.sql.Statement.RETURN_GENERATED_KEYS)) {
+				Statement.RETURN_GENERATED_KEYS)) {
 			ps.setString(1, obj.getFichier());
-			ps.setInt(2, 0); // sera fourni par la façade
+			ps.setInt(2, installation); // sera fourni par la façade
 			ps.executeUpdate();
 			try (ResultSet rs = ps.getGeneratedKeys()) {
 				if (rs.next()) {
 					int id = rs.getInt(1);
-					logger.info("Plan inséré avec ID :" +id);
+					logger.info("Plan inséré avec ID :" + id);
 					return new Plan(id, obj.getFichier());
 				}
 			}
 		} catch (Exception e) {
-			factory.dispatchException(e, "insert Plan" + obj.getFichier());
+			factory.dispatchException(e, "[INS] Plan" + obj.getFichier());
 		}
 		return obj;
 	}
