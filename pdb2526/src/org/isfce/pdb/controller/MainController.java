@@ -1,6 +1,7 @@
 package org.isfce.pdb.controller;
 
 import java.io.IOException;
+import java.io.Writer;
 import java.net.URL;
 import java.sql.Connection;
 import java.util.Locale;
@@ -17,6 +18,7 @@ import org.isfce.pdb.services.Facade;
 import org.isfce.pdb.view.bundle.I18N;
 import org.isfce.pdb.view.piece.VueListePiecesController;
 import org.isfce.pdb.view.piece.VuePieceController;
+import org.isfce.pdb.view.plan.VuePlanController;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -96,7 +98,14 @@ public class MainController extends Application {
 		bt3.setOnAction(this::actionListePieces);
 		bt3.setMaxWidth(Double.MAX_VALUE);
 		bt3.disableProperty().bind(installationChargee.not());
-
+		
+		// bt4
+		Button bt4 = new Button(I18N.getString("bt.cree.plan"));
+		leftPane.getChildren().add(bt4);
+		bt4.setOnAction(this::actionCreePlan);
+		bt4.setMaxWidth(Double.MAX_VALUE);
+		bt4.disableProperty().bind(installationChargee.not());
+		
 		cp.setLeft(leftPane);
 
 		Scene scene = new Scene(cp, 500, 400);
@@ -157,6 +166,47 @@ public class MainController extends Application {
 		} catch (IOException e) {
 			log.error("Imposible de charger la vue Piece");
 			showErreur("Impossible de charger la vue Piece: " + e.getMessage());
+		}
+		stage = null;
+	}
+	
+	/**
+	 * Affiche le formulaire d'ajout d'un Plan
+	 */
+	private void showAddPlan() {
+		// crée une stage
+		Stage stage = new Stage();
+		// indique  sa stage parent
+		stage.initOwner(mainStage);
+		stage.initModality(Modality.APPLICATION_MODAL);
+		stage.setX(100);
+		stage.setY(50);
+		// creer un loader pour charger la vue FXML
+		FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/isfce/pdb/view/plan/VuePlan.fxml"));
+		try {
+			ResourceBundle bundle = I18N.getInstance().getGlobalBundle();
+			loader.setResources(bundle);
+			// Obtenir la traduction du titre dans la locale 
+			stage.setTitle(bundle.getString("plan.titre"));
+		} catch (Exception e) {
+			log.error("Imposible de charger le bundle pour la VuePlan" + e.getMessage());
+			stage.setTitle("Vue Plan");
+		}
+		// charge la vue a partir du loader
+		// et initialise son contenu en appelant la méthode setUpdu controller 
+		try {
+			AnchorPane root = loader.load();
+			VuePlanController ctrl = loader.getController();
+			ctrl.setUpt(this, stage);
+			// charge le Pane dans la stage
+			Scene scene = new Scene(root);
+			URL cssUrl = getClass().getResource("/org/isfce/pdb/view/css/pdb2526.css");
+			if (cssUrl != null) scene.getStylesheets().add(cssUrl.toExternalForm());
+			stage.setScene(scene);
+			stage.showAndWait();
+		} catch (IOException e) {
+			log.error("Impossible de charger la vue Plan", e);
+			showErreur("Impossobile de charger la vue Plan:" + e.getMessage());
 		}
 		stage = null;
 	}
@@ -284,6 +334,10 @@ public class MainController extends Application {
 	
 	public void actionListePieces(ActionEvent event) {
 		showListePieces();
+	}
+	
+	public void actionCreePlan(ActionEvent event) {
+		showAddPlan();
 	}
 
 }
