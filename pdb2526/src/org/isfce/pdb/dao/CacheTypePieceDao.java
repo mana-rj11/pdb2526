@@ -1,6 +1,6 @@
 package org.isfce.pdb.dao;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -10,7 +10,7 @@ import org.isfce.pdb.model.TypePiece;
 
 public class CacheTypePieceDao implements ITypePieceDao {
 	private ITypePieceDao dao;
-	private Map<String, TypePiece> cache = new HashMap<String, TypePiece>();
+	private Map<String, TypePiece> cache = new LinkedHashMap<String, TypePiece>();
 	private boolean firstLoad = true;
 
 	public CacheTypePieceDao(ITypePieceDao dao) {
