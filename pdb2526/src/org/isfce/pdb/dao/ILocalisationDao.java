@@ -13,8 +13,14 @@ import org.isfce.pdb.model.Localisation;
 	 */
 public interface ILocalisationDao {
 	
-	
 	Optional<Localisation> getFromId(int idElement) throws InstallationException;
+	
+	/**
+	 * Retourne l'id de la piece sur laquelle l'id element est actuellement assignée
+	 * ou Optional.empty() si l'id element n'est assignée a aucune pièce
+	 */
+	
+	Optional<Integer> getPieceIdFromElement(int idElement) throws InstallationException;
 	
 	Localisation insert(int idElement, int idPiece, Localisation obj) throws InstallationException;
 	
