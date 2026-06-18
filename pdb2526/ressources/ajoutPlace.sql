@@ -1,0 +1,1 @@
+alter table TLOCALISATION add PLACE_LOC BOOLEAN DEFAULT FALSE not null;
