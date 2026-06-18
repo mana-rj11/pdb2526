@@ -55,6 +55,7 @@ public class TestDaoPiece {
 		var oObj = dao.getFromID(1);
 		assertTrue(oObj.isPresent());
 		assertEquals(p, oObj.get());
+		
 	}
 
 	@Test
