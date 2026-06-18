@@ -5,7 +5,9 @@ import java.util.Optional;
 
 import org.isfce.pdb.dao.DAOFactory;
 import org.isfce.pdb.exceptions.InstallationException;
+import org.isfce.pdb.model.Element;
 import org.isfce.pdb.model.Installation;
+import org.isfce.pdb.model.Localisation;
 import org.isfce.pdb.model.Piece;
 import org.isfce.pdb.model.Plan;
 import org.isfce.pdb.model.TypePiece;
@@ -136,5 +138,34 @@ public class Facade {
 		return factory.getPieceDAO().getFromID(id);
 	}
 	
+	// -----------------------------------------------------------
+	// Elements / Localisation 
+	// -----------------------------------------------------------
+	
+	/**
+	 * Retourne tous les éléments de l'installation courante
+	 */
+	public List<Element> getListeElements() throws InstallationException {
+		return factory.getElementDAO().getListeFromInstallation(getCurrentInstallation().getId());
+	}
+	
+	/**
+	 * Retourne l'id de la puissance actuellement assignée en un élément,
+	 * ou null si l'id element n'est pas assignée avec aucune puissance
+	 */
+	public Integer getPieceIdAssignee(Element element) throws InstallationException {
+		return factory.getLocalisationDAO().getPieceIdFromElement(element.getId()).orElse(null);
+	}
+	
+	/**
+	 * Assigne un id element ...
+	 */
+	public void assignerPiece(Element element, Piece piece) throws InstallationException {
+		Optional<Localisation> existante = factory.getLocalisationDAO().getFromId(element.getId());
+		if (existante.isPresent())
+			factory.getLocalisationDAO().delete(element.getId());
+		Localisation nouvelle = new Localisation(0, 0, 0, false);
+		factory.getLocalisationDAO().insert(element.getId(), piece.getId(), nouvelle);
+	}
 	
 }
