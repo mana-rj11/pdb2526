@@ -52,9 +52,28 @@ public class SQLLocalisationDao implements ILocalisationDao {
 	}
 	
 	@Override
+	public Optional<Integer> getPieceIdFromElement(int idElement) throws InstallationException {
+		String sql = "SELECT FKPIECE_LOC FROM TLOCALISATION WHERE FKELEMENT_LOC = ?";
+		Connection connect = factory.getConnection();
+		try (PreparedStatement ps = connect.prepareStatement(sql)) {
+			ps.setInt(1, idElement);
+			try (ResultSet rs = ps.executeQuery()) {
+				if (rs.next()) {
+					return Optional.of(rs.getInt("FKPIECE_LOC"));
+				}
+				return Optional.empty();
+			}
+		} catch (Exception e) {
+			factory.dispatchException(e, "getPieceIdFromElement Localisation " + idElement);
+			return Optional.empty();
+		}
+	}
+	
+	
+	@Override
 	public Localisation insert(int idElement, int idPiece, Localisation obj) throws InstallationException {
 		String sql = "INSERT INTO TLOCALISATION " + "(FKELEMENT_LOC, FKPIECE_LOC, X_LOC, Y_LOC, A_LOC, PLACE_LOC) "
-				   + "values (?, ?, ?, ?, ?)";
+				   + "values (?, ?, ?, ?, ?, ?)";
 		Connection connect = factory.getConnection();
 		try (PreparedStatement ps = connect.prepareStatement(sql)) {
 			ps.setInt(1, idElement);
@@ -67,7 +86,7 @@ public class SQLLocalisationDao implements ILocalisationDao {
 			logger.info("Localisation insérée : element=" + idElement + " piece=" + idPiece);
 			return obj;
 		} catch (Exception e) {
-			factory.dispatchException(e, "insert Localisation " + idElement);
+			factory.dispatchException(e, "[INS] Localisation " + idElement);
 			return obj;
 		}
 	}
