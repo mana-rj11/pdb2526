@@ -25,37 +25,49 @@ public class SQLElementDao implements IElementDao {
 		this.factory = factory;
 	}
 	
+	/**
+	 * Représentation brute d'une ligne TELEMENT avant résolution de l'Appareil
+	 * Nécessaire pour fermer le ResultSet avant d'appeler une autre DAO sur 
+	 * la meme connexion (sinon Firebird ferme implicitement le curseur) 
+	 */
+	private record RawElement(int id, String codeAppareil, int qt, String code, String info, int ordre) {
+	}
+	
+	
 	@Override
 	public List<Element> getListeFromInstallation(int installation) throws InstallationException {
 		String sql = "SELECT * FROM TELEMENT WHERE FKINSTALLATION_ELE = ? ORDER BY CODE_ELE, ORDRE_ELE";
 		Connection connect = factory.getConnection();
-		List<Element> liste = new ArrayList<>();
+		List<RawElement> brut = new ArrayList<>();
+		
+		// on lit toutes les lignes brutes, puis on ferme le ResultSet 
 		try (PreparedStatement ps = connect.prepareStatement(sql)) {
 			ps.setInt(1, installation);
 			try (ResultSet rs = ps.executeQuery()) {
 				while (rs.next()) {
-					String codeAppareil = rs.getString("FKAPPAREIL_ELE").trim();
-					Appareil appareil = factory.getAppareilDAO()
-							 .getFromId(codeAppareil)
-							 .orElseThrow(() -> new InstallationException("Appareil introuvable : " + codeAppareil));
-					Element element = new Element(
+					brut.add(new RawElement(
 							rs.getInt("ID_ELE"),
-							appareil,
+							rs.getString("FKAPPAREIL_ELE").trim(),
 							rs.getInt("QT_ELE"),
 							rs.getString("CODE_ELE").trim(),
 							rs.getString("INFO_ELE"),
-							rs.getInt("ORDRE_ELE")
-							
-					);
-					liste.add(element);
+							rs.getInt("ORDRE_ELE")));
 				}
 			}
-			logger.info("Elements chargés pour installation " + installation + " : " + liste.size());
-		} catch (InstallationException e) {
-			throw e;
 		} catch (Exception e) {
 			factory.dispatchException(e, "getListeFromInstallation " + installation);
+			return new ArrayList<>();
 		}
+		
+		// 2 resolution de l'Appareil, curseur ...
+		List<Element> liste = new ArrayList<>();
+		for (RawElement r : brut) {
+			Appareil appareil = factory.getAppareilDAO()
+					.getFromId(r.codeAppareil())
+					.orElseThrow(() -> new InstallationException("Appareil introuvable : " + r.codeAppareil()));
+			liste.add(new Element(r.id(), appareil, r.qt(), r.code(), r.info(), r.ordre()));
+		}
+		logger.info("Elements chargés pour installation " + installation + " : " + liste.size());
 		return liste;
 	}
 }
