@@ -11,10 +11,14 @@ module pdb2526 {
 	opens org.isfce.pdb.controller to javafx.fxml, javafx.graphics;
 	opens org.isfce.pdb.view.piece to javafx.fxml,  javafx.graphics;
 	opens org.isfce.pdb.view.plan to javafx.fxml, javafx.graphics; // new
+	opens org.isfce.pdb.view.element to javafx.fxml, javafx.graphics;
+
 
 
 	exports org.isfce.pdb;
 	exports org.isfce.pdb.controller;
 	exports org.isfce.pdb.view.piece to javafx.fxml, javafx.graphics;
 	exports org.isfce.pdb.view.plan to javafx.fxml, javafx.graphics;
+	exports org.isfce.pdb.view.element to javafx.fxml, javafx.graphics;
 }
+
