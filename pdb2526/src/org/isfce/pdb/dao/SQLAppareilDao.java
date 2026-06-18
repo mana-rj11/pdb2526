@@ -24,25 +24,30 @@ public class SQLAppareilDao implements IAppareilDao{
 	@Override 
 	public Optional<Appareil> getFromId(String id) {
 		String sql = "SELECT CODE_APP, NOM_APP, FKSVG_APP, CLASSE_APP "
-				   + "FROM TAPPAREIL WHERE CODE_APP = ?";
+				   + "FROM TAPPAREIL WHERE TRIM(CODE_APP) = ?";
+		String code = null;
+		String nom = null;
+		String fkSvg = null;
+		String classeStr = null;
 		try (PreparedStatement ps = connection.prepareStatement(sql)) {
 			ps.setString(1, id);
 			try (ResultSet rs = ps.executeQuery()) {
 				if (rs.next()) {
-					Optional<Svg> svg = svgDao.getFromId(rs.getString("FKSVG_APP"));
-					Appareil.Classe classe = Appareil.Classe.valueOf(
-						rs.getString("CLASSE_APP"));
-					return Optional.of(new Appareil(
-						rs.getString("CODE_APP"),
-						rs.getString("NOM_APP"),
-						svg.orElse(null),
-						classe
-						));
+					code = rs.getString("CODE_APP").trim();
+					nom = rs.getString("NOM_APP");
+					fkSvg = rs.getString("FKSVG_APP");
+					classeStr = rs.getString("CLASSE_APP");
+				} else {
+					return Optional.empty();
 				}
 			}
 		} catch (SQLException e) {
 			logger.severe("SQLAppareilDao.getFromId: " + e.getMessage());
+			return Optional.empty();
 		}
-		return Optional.empty();
+		// ResultSet ferm\u00e9 \u00e0 partir d'ici : on peut interroger svgDao sur la m\u00eame connexion
+		Optional<Svg> svg = svgDao.getFromId(fkSvg);
+		Appareil.Classe classe = Appareil.Classe.valueOf(classeStr);
+		return Optional.of(new Appareil(code, nom, svg.orElse(null), classe));
 	}
 }
