@@ -16,6 +16,7 @@ import org.isfce.pdb.databases.uri.Databases;
 import org.isfce.pdb.exceptions.InstallationException;
 import org.isfce.pdb.services.Facade;
 import org.isfce.pdb.view.bundle.I18N;
+import org.isfce.pdb.view.element.VueListeElementsController;
 import org.isfce.pdb.view.piece.VueListePiecesController;
 import org.isfce.pdb.view.piece.VuePieceController;
 import org.isfce.pdb.view.plan.VuePlanController;
@@ -99,15 +100,22 @@ public class MainController extends Application {
 		bt3.setMaxWidth(Double.MAX_VALUE);
 		bt3.disableProperty().bind(installationChargee.not());
 		
-		// bt4
+		// bt4..
 		Button bt4 = new Button(I18N.getString("bt.cree.plan"));
 		leftPane.getChildren().add(bt4);
 		bt4.setOnAction(this::actionCreePlan);
 		bt4.setMaxWidth(Double.MAX_VALUE);
 		bt4.disableProperty().bind(installationChargee.not());
 		
+		// bt5..
+		Button bt5 = new Button(I18N.getString("bt.element"));
+		leftPane.getChildren().add(bt5);
+		bt5.setOnAction(this::actionListeElements);
+		bt5.setMaxWidth(Double.MAX_VALUE);
+		bt5.disableProperty().bind(installationChargee.not());
+		
 		cp.setLeft(leftPane);
-
+		
 		Scene scene = new Scene(cp, 500, 400);
 		mainStage.setScene(scene);
 		mainStage.setTitle("Projet PDB 2526");
@@ -252,7 +260,43 @@ public class MainController extends Application {
 		stage = null;
 				
 	}
-
+	
+	/**
+	 * Affiche la liste des éléments
+	 */
+	public void showListeElements() {
+		Stage stage = new Stage();
+		stage.initOwner(mainStage);
+		stage.setX(100);
+		stage.setY(50);
+		
+		FXMLLoader loader = new FXMLLoader(
+			getClass().getResource("/org/isfce/pdb/view/element/VueListeElements.fxml"));
+		try {
+			ResourceBundle bundle = I18N.getInstance().getGlobalBundle();
+			loader.setResources(bundle);
+			stage.setTitle(bundle.getString("liste.element.titre"));
+		} catch (Exception e) {
+			log.error("Impossible de charger le bundle VueListeElements : " + e.getMessage());
+			stage.setTitle("Vue Liste Elements");
+		}
+		
+		try {
+			BorderPane root = loader.load();
+			VueListeElementsController ctrl = loader.getController();
+			ctrl.setUp(this, stage);
+			Scene scene = new Scene(root);
+			URL cssUrl = getClass().getResource("/org/isfce/pdb/view/css/pdb2526.css");
+			if (cssUrl != null) scene.getStylesheets().add(cssUrl.toExternalForm());
+			stage.setScene(scene);
+			stage.show();
+		} catch (IOException e) {
+			log.error("Impossible de charger la vue ListeElements");
+			showErreur("Impossible de charger la vue ListeElements: " + e.getMessage());
+		}
+		stage = null;
+	}
+	
 
 	/**
 	 * Boite de confirmation
@@ -338,6 +382,10 @@ public class MainController extends Application {
 	
 	public void actionCreePlan(ActionEvent event) {
 		showAddPlan();
+	}
+	
+	public void actionListeElements(ActionEvent event) {
+		showListeElements();
 	}
 
 }
