@@ -92,8 +92,18 @@ public class VueImplantationController implements Initializable {
 	@FXML
 	void actionValider(ActionEvent event) {
 		//TODO gérer la sauvegarde
-		if (ctrl.showConfirmation(I18N.getString("conf.save")))
-			stage.hide();
+		if (ctrl.showConfirmation(I18N.getString("conf.save"))) {
+			try {
+				java.util.List<Element> tousLesElements = new java.util.ArrayList<>();
+				for (var listeElements : mapPlanElements.values()) {
+					tousLesElements.addAll(listeElements);
+				}
+				ctrl.getFacade().sauvegarderImplantation(tousLesElements);
+				stage.hide();
+			} catch (org.isfce.pdb.exceptions.InstallationException e) {
+				ctrl.showErreur(e.getMessage());
+			}
+		}
 	}
 
 	@FXML
