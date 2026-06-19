@@ -14,4 +14,5 @@ public final class Element {
 	private final String code;
 	private final String info;
 	private final int ordre;
+	private final Localisation localisation;
 }
