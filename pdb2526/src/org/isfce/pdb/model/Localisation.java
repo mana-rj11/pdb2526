@@ -22,6 +22,6 @@ import lombok.ToString;
 public class Localisation {
 	private double x;
 	private double y;
-	private double a;
+	private double angle;
 	private boolean place;
 }
