@@ -169,6 +169,17 @@ public class Facade {
 	}
 	
 	/**
+	 * Sauvegarde en base la localisation actuelle de chaque 
+	 */
+	public void sauvegarderImplantation(java.util.Collection<Element> elements) throws InstallationException {
+		for (Element e : elements) {
+			if (e.getLocalisation() != null) {
+				factory.getLocalisationDAO().update(e.getId(), e.getLocalisation());
+			}
+		}
+	}
+	
+	/**
 	 * Retourne tous les plans de l'installation courante
 	 */
 	public List<Plan> getListePlans() throws InstallationException {
