@@ -168,4 +168,33 @@ public class Facade {
 		factory.getLocalisationDAO().insert(element.getId(), piece.getId(), nouvelle);
 	}
 	
+	/**
+	 * Retourne tous les plans de l'installation courante
+	 */
+	public List<Plan> getListePlans() throws InstallationException {
+		return factory.getPlanDAO().getListePlanFromInstallation(getCurrentInstallation().getId());
+	}
+	
+	/**
+	 * Retourne les ...
+	 */
+	public List<Element> getElementsPlan(Plan plan) throws InstallationException {
+		List<Element> tous = getListeElements();
+		List<Piece> piecesDuPlan = getListePieces().stream()
+				.filter(p -> p.getPlan() != null && p.getPlan().getId() == plan.getId())
+				.toList();
+		List<Element> resultat = new java.util.ArrayList<>();
+		for (Element e : tous) {
+			Integer idPiece = getPieceIdAssignee(e);
+			if (idPiece != null && piecesDuPlan.stream().anyMatch(p -> p.getId().equals(idPiece))) {
+				resultat.add(e);
+			}
+		} 
+		return resultat;
+	}
+	
+	public java.util.Properties getProperties() {
+		return org.isfce.pdb.view.bundle.I18N.getInstance().getProperties();
+	}
+	
 }
