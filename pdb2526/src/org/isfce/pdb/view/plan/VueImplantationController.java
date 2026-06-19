@@ -218,6 +218,7 @@ public class VueImplantationController implements Initializable {
 					mapPlanNodes.get(oPlanCharge.get().getId()).remove(oElementView.get());
 					//indique que l'élément n'est plus placé																
 					oElementView.get().getElement().getLocalisation().setPlace(false);
+					lstElements.refresh(); // met a jour le style visuel
 					event.consume();
 				}
 			});
@@ -289,10 +290,17 @@ public class VueImplantationController implements Initializable {
 				protected void updateItem(Element element, boolean empty) {
 					super.updateItem(element, empty);
 
-					if (empty || element == null)
+					if (empty || element == null) {
 						setText(null);
-					else
+						setStyle("");
+					} else {
 						setText(element.getCode() + ":" + element.getAppareil().getNom());
+						if (element.getLocalisation() != null && element.getLocalisation().isPlace()) {
+							setStyle("-fx-text-fill: gray; -fx-font-style: italic;");
+						} else {
+							setStyle("");
+						}
+					}
 				}
 			};
 
@@ -344,6 +352,7 @@ public class VueImplantationController implements Initializable {
 				// ajoute l'elementView aux elements du plan
 				mapPlanNodes.get(oPlanCharge.get().getId()).add(elementView);
 				element.getLocalisation().setPlace(true);//indique qu'il est placé
+				lstElements.refresh(); // met a jour le style visuel
 
 				elementView.setSelected(true);//sélectionne l'élément que l'on vient de mettre
 			}
