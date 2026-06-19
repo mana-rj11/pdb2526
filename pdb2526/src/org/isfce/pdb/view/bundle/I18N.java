@@ -1,6 +1,9 @@
 package org.isfce.pdb.view.bundle;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Locale;
+import java.util.Properties;
 import java.util.ResourceBundle;
 
 public class I18N {
@@ -32,6 +35,15 @@ public class I18N {
 	public ResourceBundle getGlobalBundle() {
 		return ResourceBundle.getBundle(GLOBAL_BUNDLE_BASE_NAME,
 			Locale.getDefault());
+	}
+	
+	public Properties getProperties() {
+		Properties props = new Properties();
+		ResourceBundle bundle = getGlobalBundle();
+		for (String key : bundle.keySet()) {
+			props.setProperty(key, bundle.getString(key));
+		}
+		return props;
 	}
 
 }
