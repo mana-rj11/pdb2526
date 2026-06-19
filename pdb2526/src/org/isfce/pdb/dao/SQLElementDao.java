@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 import org.isfce.pdb.exceptions.InstallationException;
 import org.isfce.pdb.model.Appareil;
 import org.isfce.pdb.model.Element;
+import org.isfce.pdb.model.Localisation;
 
 
 /**
@@ -65,7 +66,10 @@ public class SQLElementDao implements IElementDao {
 			Appareil appareil = factory.getAppareilDAO()
 					.getFromId(r.codeAppareil())
 					.orElseThrow(() -> new InstallationException("Appareil introuvable : " + r.codeAppareil()));
-			liste.add(new Element(r.id(), appareil, r.qt(), r.code(), r.info(), r.ordre()));
+			Localisation localisation = factory.getLocalisationDAO()
+					.getFromId(r.id())
+					.orElse(new Localisation(0, 0, 0, false));
+			liste.add(new Element(r.id(), appareil, r.qt(), r.code(), r.info(), r.ordre(), localisation));
 		}
 		logger.info("Elements chargés pour installation " + installation + " : " + liste.size());
 		return liste;
