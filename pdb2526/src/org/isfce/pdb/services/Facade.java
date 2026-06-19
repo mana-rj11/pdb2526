@@ -158,6 +158,18 @@ public class Facade {
 	}
 	
 	/**
+	 * Retourne la piece dans laquelle un element est assignee, si elle existe 
+	 */
+	public java.util.Optional<Piece> getPieceDeElement(Element element) throws InstallationException {
+		Integer idPiece = getPieceIdAssignee(element);
+		if (idPiece == null)
+			return java.util.Optional.empty();
+		return getListePieces().stream()
+				.filter(p -> p.getId().equals(idPiece))
+				.findFirst();
+	}
+	
+	/**
 	 * Assigne un id element ...
 	 */
 	public void assignerPiece(Element element, Piece piece) throws InstallationException {
