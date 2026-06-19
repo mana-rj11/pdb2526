@@ -80,7 +80,7 @@ public class SQLLocalisationDao implements ILocalisationDao {
 			ps.setInt(2, idPiece);
 			ps.setDouble(3, obj.getX());
 			ps.setDouble(4, obj.getY());
-			ps.setDouble(5, obj.getA());
+			ps.setDouble(5, obj.getAngle());
 			ps.setBoolean(6, obj.isPlace());
 			ps.executeUpdate();
 			logger.info("Localisation insérée : element=" + idElement + " piece=" + idPiece);
@@ -99,7 +99,7 @@ public class SQLLocalisationDao implements ILocalisationDao {
 		try (PreparedStatement ps = connect.prepareStatement(sql)) {
 			ps.setDouble(1, obj.getX());
 			ps.setDouble(2, obj.getY());
-			ps.setDouble(3, obj.getA());
+			ps.setDouble(3, obj.getAngle());
 			ps.setBoolean(4, obj.isPlace());
 			ps.setInt(5, idElement);
 			// ps.setInt(6, id.getIdPiece());
