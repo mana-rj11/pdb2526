@@ -15,6 +15,7 @@ import java.util.ResourceBundle;
 import org.isfce.pdb.controller.MainController;
 import org.isfce.pdb.exceptions.InstallationException;
 import org.isfce.pdb.model.Element;
+import org.isfce.pdb.model.Piece;
 import org.isfce.pdb.model.Plan;
 import org.isfce.pdb.services.Facade;
 import org.isfce.pdb.view.bundle.I18N;
@@ -64,6 +65,9 @@ public class VueImplantationController implements Initializable {
 
 	@FXML
 	private ComboBox<Plan> cbPlans;
+	
+	@FXML 
+	private ComboBox<Piece> cbPieces;
 
 	@FXML
 	private ListView<Element> lstElements;
@@ -81,6 +85,8 @@ public class VueImplantationController implements Initializable {
 	private Map<Integer, List<ElementView>> mapPlanNodes = new HashMap<>();
 	// associe à un plan la liste observable de ses éléments
 	private Map<Integer, ObservableList<Element>> mapPlanElements = new HashMap<>();
+	// associe à un plan une Map (id élément -> Pièce) pour le filtre par pièce
+	private Map<Integer, Map<Integer, Piece>> mapPlanElementPiece = new HashMap<>();
 
 	@FXML
 	void actionQuitter(ActionEvent event) {
@@ -126,10 +132,38 @@ public class VueImplantationController implements Initializable {
 
 			// dessine les éléments déjà placés
 			pane.getChildren().addAll(mapPlanNodes.get(planCharge.getId()));
+			
+			// met à jour le filtre par pièce pour ce plan
+			ObservableList<Piece> piecesDuPlan = FXCollections.observableArrayList();
+			piecesDuPlan.add(null); // toutes les pièces
+			piecesDuPlan.addAll(mapPlanElementPiece.get(planCharge.getId()).values().stream().distinct().toList());
+			cbPieces.setItems(piecesDuPlan);
+			cbPieces.getSelectionModel().select(null); // pas de filtre par défaut 
 
 		}
 
 	}
+	
+	@FXML 
+	void actionFiltrePiece(ActionEvent event) {
+		if (oPlanCharge.isEmpty())
+			return;
+		Piece filtre = cbPieces.getValue();
+		ObservableList<Element> tousLesElements = mapPlanElements.get(oPlanCharge.get().getId());
+		if (filtre == null) {
+			lstElements.setItems(tousLesElements);
+		} else {
+			Map<Integer, Piece> elementPieceMap = mapPlanElementPiece.get(oPlanCharge.get().getId());
+			ObservableList<Element> filtres = FXCollections.observableArrayList(
+					tousLesElements.stream()
+							.filter(e -> filtre.equals(elementPieceMap.get(e.getId())))
+							.toList());
+			lstElements.setItems(filtres);
+		}
+	}
+	
+	
+	
 
 	/**
 	 * Permet de fournir l'accès aux données
@@ -191,13 +225,17 @@ public class VueImplantationController implements Initializable {
 			// on crée la map qui associe au plan une liste d'ElementView
 			for (Plan plan : obsPlan) {
 				List<ElementView> nodes = new ArrayList<ElementView>();
+				Map<Integer, Piece> elementPieceMap = new HashMap<>();
 				//pour chaque élément du plan
-				for (Element element : mapPlanElements.get(plan.getId()))
+				for (Element element : mapPlanElements.get(plan.getId())) {
 					//pour chaque élement déjà placé, on crée un ElementView
 					if (element.getLocalisation().isPlace())
 						nodes.add(creeElementView(element));
+					facade.getPieceDeElement(element).ifPresent(p -> elementPieceMap.put(element.getId(), p));
+				}
 				// pour un plan on associe sa liste d'ElementView
 				mapPlanNodes.put(plan.getId(), nodes);
+				mapPlanElementPiece.put(plan.getId(), elementPieceMap);
 			}
 			//Action sur la touche R (rotation) et DEL (suppression)
 			stage.getScene().setOnKeyPressed(event -> {
@@ -385,8 +423,21 @@ public class VueImplantationController implements Initializable {
 			if (ev.getTarget() instanceof Canvas)
 				lstElements.getSelectionModel().clearSelection();
 		});
+		
+		cbPieces.setConverter(new javafx.util.StringConverter<Piece>() {
+			@Override
+			public String toString(Piece piece) {
+				return piece == null ? I18N.getString("filtre.toutes.pieces") : piece.getNom();
+			}
+			@Override
+			public Piece fromString(String string) {
+				return null;
+			}
+		});
 
 	}
+	
+	
 
 	/**
 	 * Crée un ElementView à partir d'un élément et le positionne sur le pane s'il est déjà placé 
