@@ -1,7 +1,6 @@
 package org.isfce.pdb.controller;
 
 import java.io.IOException;
-import java.io.Writer;
 import java.net.URL;
 import java.sql.Connection;
 import java.util.Locale;
@@ -19,6 +18,7 @@ import org.isfce.pdb.view.bundle.I18N;
 import org.isfce.pdb.view.element.VueListeElementsController;
 import org.isfce.pdb.view.piece.VueListePiecesController;
 import org.isfce.pdb.view.piece.VuePieceController;
+import org.isfce.pdb.view.plan.VueImplantationController;
 import org.isfce.pdb.view.plan.VuePlanController;
 
 import javafx.application.Application;
@@ -113,6 +113,13 @@ public class MainController extends Application {
 		bt5.setOnAction(this::actionListeElements);
 		bt5.setMaxWidth(Double.MAX_VALUE);
 		bt5.disableProperty().bind(installationChargee.not());
+		
+		// bt6..
+		Button bt6 = new Button(I18N.getString("bt.implantation"));
+		leftPane.getChildren().add(bt6);
+		bt6.setOnAction(this::actionImplantation);
+		bt6.setMaxWidth(Double.MAX_VALUE);
+		bt6.disableProperty().bind(installationChargee.not());
 		
 		cp.setLeft(leftPane);
 		
@@ -297,6 +304,39 @@ public class MainController extends Application {
 		stage = null;
 	}
 	
+	/**
+	 * Affiche la vue d'implantation graphique
+	 */
+	public void showImplantation() {
+		Stage stage = new Stage();
+		stage.initOwner(mainStage);
+		stage.setX(100);
+		stage.setY(50);
+		
+		FXMLLoader loader = new FXMLLoader(
+			getClass().getResource("/org/isfce/pdb/view/plan/VueImplantation.fxml"));
+		try { 
+			ResourceBundle bundle = I18N.getInstance().getGlobalBundle();
+			loader.setResources(bundle);
+			stage.setTitle(bundle.getString("bt.implantation"));
+		} catch (Exception e) {
+			log.error("Impossible de charger le bundle VueImplantation : " + e.getMessage());
+			stage.setTitle("Vue Implantation");
+		}
+		
+		try {
+			BorderPane root = loader.load();
+			stage.setScene(new Scene(root));
+			VueImplantationController ctrl = loader.getController();
+			ctrl.setUp(this, stage);
+			stage.showAndWait();
+		} catch (IOException e) {
+			log.error("Impossible de charger la vue Implantation");
+			showErreur("Impossible de charger la vue Implantation: " + e.getMessage());
+		}
+		stage = null;
+	}
+	
 
 	/**
 	 * Boite de confirmation
@@ -386,6 +426,10 @@ public class MainController extends Application {
 	
 	public void actionListeElements(ActionEvent event) {
 		showListeElements();
+	}
+	
+	public void actionImplantation(ActionEvent event) {
+		showImplantation();
 	}
 
 }
