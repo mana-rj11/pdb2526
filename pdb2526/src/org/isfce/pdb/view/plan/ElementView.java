@@ -33,6 +33,7 @@ public class ElementView extends Group {
 	private final Svg svg;// objet svg métier
 	private final Rectangle box;
 	private final Text text;
+	private final Text textQt;
 	private boolean selected = false;
 
 	private final Rotate rotate;
@@ -77,8 +78,15 @@ public class ElementView extends Group {
 		this.text.setFill(COLOR_TEXT);
 		this.text.setX(b.getCenterX());
 		this.text.setY(b.getMinY() - 5);
+		
+		// affiche la quantité x2, x3 sous le symbole, uniquement si > 1
+		this.textQt = new Text(element.getQt() > 1 ? "x" + element.getQt() : "");
+		this.textQt.setFont(TEXT_FONT_SIZE);
+		this.textQt.setFill(COLOR_TEXT);
+		this.textQt.setX(b.getCenterX());
+		this.textQt.setY(b.getMaxY() + 12);
 
-		getChildren().addAll(svgPath, box, text);
+		getChildren().addAll(svgPath, box, text, textQt);
 		getTransforms().add(rotate);
 
 		//s'il est déjà placé on précise son angle initial
