@@ -59,18 +59,27 @@ public class SQLPieceDao implements IPieceDao {
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                String typeP = rs.getString("FKTYPE_PIE");
-                TypePiece tp = factory.getTypePieceDAO().getFromID(typeP).get();
+            	// tout capturer depuis rs d'abord 
+                String nom = rs.getString("NOM_PIE");
+                String desc = rs.getString("DESCIPTION_PIE");
+                BigDecimal etage = rs.getBigDecimal("ETAGE_PIE").setScale(1);
+                String typeCode = rs.getString("FKTYPE_PIE");
+                int instId = rs.getInt("FKINSTALLATION_PIE");
+                Integer fkPlan = (Integer) rs.getObject("FKPLAN_PIE");
+                // rs peut fermé maintenant
+                
+                // résoudre les objets liés
+                TypePiece tp = factory.getTypePieceDAO().getFromID(typeCode).get();	// cahce est ok
 
-                Plan plan = resolvePlan((Integer) rs.getObject("FKPLAN_PIE"));
+                Plan plan = resolvePlan(fkPlan);	// ouvre un 2e curseur 
 
                 obj = Piece.builder()
                         .id(id)
-                        .nom(rs.getString("NOM_PIE"))
-                        .description(rs.getString("DESCRIPTION_PIE"))
-                        .etage(rs.getBigDecimal("ETAGE_PIE").setScale(1))
+                        .nom(nom)
+                        .description(desc)
+                        .etage(etage)
                         .typePiece(tp)
-                        .installation(rs.getInt("FKINSTALLATION_PIE"))
+                        .installation(instId)
                         .plan(plan)
                         .build();
                 log.debug("Une pièce est chargée: " + obj);
