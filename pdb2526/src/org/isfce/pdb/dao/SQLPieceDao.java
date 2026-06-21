@@ -61,7 +61,7 @@ public class SQLPieceDao implements IPieceDao {
             if (rs.next()) {
             	// tout capturer depuis rs d'abord 
                 String nom = rs.getString("NOM_PIE");
-                String desc = rs.getString("DESCIPTION_PIE");
+                String desc = rs.getString("DESCRIPTION_PIE");
                 BigDecimal etage = rs.getBigDecimal("ETAGE_PIE").setScale(1);
                 String typeCode = rs.getString("FKTYPE_PIE");
                 int instId = rs.getInt("FKINSTALLATION_PIE");
