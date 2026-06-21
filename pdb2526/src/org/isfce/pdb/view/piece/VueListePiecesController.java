@@ -98,14 +98,16 @@ public class VueListePiecesController implements Initializable {
 	
 	@FXML
 	void actionRecharger(ActionEvent event) {
-		for (Piece piece : mapUpdate.values()) {
-			int pos = obsPieces.indexOf(piece);
-			facade.getPiece(piece.getId())
-				.ifPresent(p -> obsPieces.set(pos, p));
-		}
+		obsPieces.setAll(facade.getListePieces());
 		mapUpdate.clear();
-		update.set(false);
-	}
+		update.set(false);	// rechargement complet depuis la BD
+		
+		// anciene version 
+		// for (Piece piece : mapUpdate.values()) {
+			// int pos = obsPieces.indexOf(piece);
+			// facade.getPiece(piece.getId())
+				// .ifPresent(p -> obsPieces.set(pos, p));
+		}
 	
 	@FXML
 	void actionValider(ActionEvent event) {
@@ -292,7 +294,7 @@ public class VueListePiecesController implements Initializable {
 	
 	// boutons actif uniquement si modification
 	btValider.disableProperty().bind(update.not());
-	btRecharger.disableProperty().bind(update.not());
+	// btRecharger.disableProperty().bind(update.not());
 	}
 	
 }
