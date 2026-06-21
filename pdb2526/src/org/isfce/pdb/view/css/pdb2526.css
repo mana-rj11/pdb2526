@@ -32,3 +32,48 @@
     -fx-background-color: orange;
     -fx-border-color: red;
 }
+
+/* Alternance de couleurs sur les lignes */
+.table-row-cell:odd {
+    -fx-background-color: #E1F5FE;
+}
+.table-row-cell:even {
+    -fx-background-color: white;
+}
+
+/* En-têtes des colonnes */
+.column-header {
+    -fx-background-color: #B3E5FC;
+    -fx-font-family: 'Georgia';
+    -fx-font-size: 13px;
+}
+
+/* Ligne sélectionnée */
+.table-row-cell:selected {
+    -fx-background-color: #4FC3F7;
+}
+
+/* Bordures visibles entre cellules */
+.table-cell {
+    -fx-border-color: #E0E0E0;
+    -fx-border-width: 0 0 0.5 0;
+}
+
+/* Style du ScrollPane */
+.scroll-pane {
+    -fx-background-color: white;
+    -fx-border-color: #B3E5FC;
+    -fx-border-radius: 5;
+}
+
+/* Bouton suppression (poubelle) en rouge au hover */
+.button-delete:hover {
+    -fx-background-color: #FFCDD2;
+    -fx-border-color: #E53935;
+}
+
+/* ComboBox style cohérent */
+.combo-box {
+    -fx-font-family: 'Georgia';
+    -fx-font-size: 13px;
+}
