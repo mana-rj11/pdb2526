@@ -26,7 +26,7 @@ public class TestDaoPiece {
 
 	private static IPieceDao dao;
 	static TypePiece tp = new TypePiece("SALON", "Salon", false);
-	static Plan plan1 = new Plan(1, "Rez de chaussé");
+	static Plan plan1 = new Plan(1, "Rez de chaussé", "Rez de chaussé");
 	static Piece p = Piece.builder().id(1).nom("SALON").description("Salon principal")
 			.etage(new BigDecimal(0.0).setScale(1)).typePiece(tp).installation(3).plan(plan1).build();
 

@@ -25,10 +25,9 @@ public class SQLPlanDao implements IPlanDao {
 	}
 	
 	private Plan mapResultSet(ResultSet rs) throws Exception {
-		return new Plan(
-			rs.getInt("ID_PLA"),
-			rs.getString("NOM_PLA")
-		);	
+			String fichier = rs.getString("NOM_PLA").trim();
+			String nom = fichier.replace(".png", "");
+			return new Plan(rs.getInt("ID_PLA"), nom, fichier);
 	}
 	
 	@Override
@@ -83,7 +82,7 @@ public class SQLPlanDao implements IPlanDao {
 				if (rs.next()) {
 					int id = rs.getInt(1);
 					logger.info("Plan inséré avec ID :" + id);
-					return new Plan(id, obj.getFichier());
+					return new Plan(id, obj.getNom(), obj.getFichier());
 				}
 			}
 		} catch (Exception e) {

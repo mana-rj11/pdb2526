@@ -34,7 +34,9 @@ public class VuePlanController {
 		boolean bad = checkData();
 		if (!bad) {
 			try {
-				plan = new Plan(0, ztNom.getText().trim());
+				String fichier = ztNom.getText().trim();
+				String nom = fichier.replace(".png", "");
+				plan = new Plan(0, nom, fichier);
 				this.ctrl.getFacade().insertPlan(plan);
 				this.stage.close();
 			} catch (InstallationException e) {

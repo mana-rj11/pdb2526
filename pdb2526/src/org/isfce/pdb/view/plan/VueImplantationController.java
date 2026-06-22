@@ -40,6 +40,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -211,9 +212,22 @@ public class VueImplantationController implements Initializable {
 					}
 				}
 			}
+			
+			cbPlans.setConverter(new StringConverter<Plan>() {
+				@Override 
+				public String toString(Plan plan) {
+					return plan != null ? plan.getNom() : "";
+				}
+				@Override
+				public Plan fromString(String s) {
+					return null;
+				}
+			});
+				
+			
 			// mets la liste observable de la comboBox cbPlans
 			cbPlans.setItems(obsPlan);
-
+			
 			// Crée une Map qui associe à chaque plan sa liste observable
 			// d'éléments
 			for (Plan plan : obsPlan) {
@@ -261,7 +275,7 @@ public class VueImplantationController implements Initializable {
 				}
 			});
 			
-			//désélectionne les ElementView de l'ancien Plan si on change de plan
+			// désélectionne les ElementView de l'ancien Plan si on change de plan
 			cbPlans.valueProperty().addListener((_, oldV, _) -> {
 				if (oldV != null) {
 					mapPlanNodes.get(oldV.getId()).forEach(ev -> ev.setSelected(false));
