@@ -45,7 +45,7 @@ public class SQLAppareilDao implements IAppareilDao{
 			logger.severe("SQLAppareilDao.getFromId: " + e.getMessage());
 			return Optional.empty();
 		}
-		// ResultSet ferm\u00e9 \u00e0 partir d'ici : on peut interroger svgDao sur la m\u00eame connexion
+		// ResultSet fermé a partir d'ici : on peut interroger svgDao sur la meme connexion
 		Optional<Svg> svg = svgDao.getFromId(fkSvg);
 		Appareil.Classe classe = Appareil.Classe.valueOf(classeStr);
 		return Optional.of(new Appareil(code, nom, svg.orElse(null), classe));
