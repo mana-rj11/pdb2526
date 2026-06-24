@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 
-<AnchorPane prefHeight="150.0" prefWidth="400.0"
+<AnchorPane prefHeight="170.0" prefWidth="450.0"
     xmlns:fx="http://javafx.com/fxml/1"
     xmlns="http://javafx.com/javafx/23.0.1"
     fx:controller="org.isfce.pdb.view.plan.VuePlanController">
@@ -15,9 +15,14 @@
       <Label styleClass="titre" text="%titre.plan.creer"
           AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0" />
       <Label styleClass="main-label" text="%plan.nom"
-          layoutY="60.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="200.0" AnchorPane.topAnchor="60.0" />
-      <TextField fx:id="ztNom" styleClass="main-text-field"
-          layoutY="60.0" AnchorPane.leftAnchor="200.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="60.0" />
+          AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="60.0" />
+      <HBox spacing="5" alignment="CENTER_LEFT"
+          AnchorPane.leftAnchor="150.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="57.0">
+         <children>
+            <TextField fx:id="ztNom" styleClass="main-text-field" HBox.hgrow="ALWAYS"/>
+            <Button text="Parcourir" onAction="#actionParcourir"/>
+         </children>
+      </HBox>
       <HBox alignment="CENTER_RIGHT" spacing="10.0"
           AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0">
          <children>

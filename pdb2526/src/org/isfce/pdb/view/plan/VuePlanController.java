@@ -1,5 +1,7 @@
 package org.isfce.pdb.view.plan;
 
+import java.io.File;
+
 import org.isfce.pdb.controller.MainController;
 import org.isfce.pdb.exceptions.InstallationException;
 import org.isfce.pdb.model.Plan;
@@ -8,6 +10,7 @@ import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 public class VuePlanController {
@@ -42,6 +45,21 @@ public class VuePlanController {
 			} catch (InstallationException e) {
 				ctrl.showErreur(e.getMessage());
 			}
+		}
+	}
+	
+	@FXML
+	void actionParcourir(ActionEvent event) {
+		// ouvre l'explorateur de fichier pour sélectionner une image
+		FileChooser fc = new FileChooser();
+		fc.setTitle("Selectionner un plan");
+		// filtre pour n'afficher que les images
+		fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Images", "*.png", "*.jpg"));
+		// ouvre la boîte du dialogue
+		File file = fc.showOpenDialog(stage);
+		// si l'user a sélectionné un fichier, met le nom dans le champ
+		if (file != null) {
+			ztNom.setText(file.getName());
 		}
 	}
 	
