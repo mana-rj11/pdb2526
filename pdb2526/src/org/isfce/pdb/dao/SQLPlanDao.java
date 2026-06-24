@@ -27,7 +27,9 @@ public class SQLPlanDao implements IPlanDao {
 	private Plan mapResultSet(ResultSet rs) throws Exception {
 			String fichier = rs.getString("NOM_PLA").trim();
 			String nom = fichier.replace(".png", "");
-			return new Plan(rs.getInt("ID_PLA"), nom, fichier);
+		    int etage = rs.getInt("ETAGE_PLA");  // etage ajouté
+		    return new Plan(rs.getInt("ID_PLA"), nom, fichier, etage);	// etage ajouté
+
 	}
 	
 	@Override
@@ -71,18 +73,19 @@ public class SQLPlanDao implements IPlanDao {
 
 	@Override
 	public Plan insert(Plan obj, int installation) throws InstallationException {
-		String sql = "INSERT INTO TPLAN (NOM_PLA, FKINSTALLATION_PLA) VALUES (?, ?)";
+		String sql = "INSERT INTO TPLAN (NOM_PLA, FKINSTALLATION_PLA, ETAGE_PLA) VALUES (?, ?, ?)"; // 3e paramètre
 		Connection connect = factory.getConnection();
 		try (PreparedStatement ps = connect.prepareStatement(sql,
 				Statement.RETURN_GENERATED_KEYS)) {
 			ps.setString(1, obj.getFichier());
 			ps.setInt(2, installation); // sera fourni par la façade
+			ps.setInt(3, obj.getEtage());	// passe l'etage
 			ps.executeUpdate();
 			try (ResultSet rs = ps.getGeneratedKeys()) {
 				if (rs.next()) {
 					int id = rs.getInt(1);
 					logger.info("Plan inséré avec ID :" + id);
-					return new Plan(id, obj.getNom(), obj.getFichier());
+					return new Plan(id, obj.getNom(), obj.getFichier(), obj.getEtage()); // etage ajouté
 				}
 			}
 		} catch (Exception e) {
@@ -91,3 +94,4 @@ public class SQLPlanDao implements IPlanDao {
 		return obj;
 	}
 }
+

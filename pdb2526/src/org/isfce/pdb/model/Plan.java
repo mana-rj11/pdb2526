@@ -13,5 +13,7 @@ public class Plan {
 	private final int id;
 	private final String nom;
 	private final String fichier;
+    private final int etage; // etage ajouté
+
 
 }

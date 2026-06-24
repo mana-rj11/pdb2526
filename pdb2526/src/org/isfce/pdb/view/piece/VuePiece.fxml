@@ -30,6 +30,12 @@
           layoutY="140.0" AnchorPane.leftAnchor="200.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="140.0" />
       <Label styleClass="main-label" text="%piece.typePiece"
           layoutY="180.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="200.0" AnchorPane.topAnchor="180.0" />
+      
+      <Label styleClass="main-label" text="Plan"
+    	  AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="140.0"/>
+	  <ComboBox fx:id="cbPlan" AnchorPane.leftAnchor="150.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="140.0"/>    
+          
+          
       <ComboBox fx:id="cbTypePiece"
           layoutY="180.0" AnchorPane.leftAnchor="200.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="180.0" />
       <HBox alignment="CENTER_RIGHT" spacing="10.0"

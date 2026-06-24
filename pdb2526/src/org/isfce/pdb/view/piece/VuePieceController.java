@@ -9,6 +9,7 @@ import java.util.ResourceBundle;
 import org.isfce.pdb.controller.MainController;
 import org.isfce.pdb.exceptions.InstallationException;
 import org.isfce.pdb.model.Piece;
+import org.isfce.pdb.model.Plan;
 import org.isfce.pdb.model.TypePiece;
 
 import javafx.collections.FXCollections;
@@ -35,6 +36,8 @@ public class VuePieceController implements Initializable {
 	private Spinner<Double> spEtage;
 	@FXML
 	private ComboBox<TypePiece> cbTypePiece;
+	@FXML 
+	private ComboBox<Plan> cbPlan;	// plan ajouté
 
 	// private ResourceBundle bundle;
 
@@ -54,13 +57,18 @@ public class VuePieceController implements Initializable {
 		Piece piece;
 		// Vérifie la validité des encodages
 		boolean bad = checkData();
+		if (cbPlan.getValue() == null) {
+		    ctrl.showErreur("Veuillez sélectionner un plan");
+		    return;
+		}
 		if (!bad) {
 			// Création de l'objet
 			try {
 				piece = Piece.builder().nom(ztNom.getText().trim()).description(ztDescription.getText().trim())
 						.etage(BigDecimal.valueOf(spEtage.getValue()).setScale(1, RoundingMode.HALF_UP))
 						.typePiece(cbTypePiece.getValue())
-						.installation(ctrl.getFacade().getCurrentInstallation().getId()).build();
+						.installation(ctrl.getFacade().getCurrentInstallation().getId()).plan(cbPlan.getValue()) // associe pieces au plan
+						.build();
 
 				this.ctrl.getFacade().insertPiece(piece);
 				this.stage.close();
@@ -105,8 +113,18 @@ public class VuePieceController implements Initializable {
 		this.ctrl = ctrl;
 		List<TypePiece> listeTypePiece = ctrl.getFacade().getTypePiece();
 		cbTypePiece.setItems(FXCollections.observableArrayList(listeTypePiece));
-
-	}
+		try {
+			cbPlan.setItems(FXCollections.observableArrayList(ctrl.getFacade().getListePlans()));
+		} catch (InstallationException e) {ctrl.showErreur(e.getMessage());}
+		cbPlan.setConverter(new StringConverter<Plan>() {
+			
+		    public String toString(Plan p) { 
+		        return p != null ? p.getNom() + " (ét." + p.getEtage() + ")" : ""; 
+		    }
+		    @Override
+		    public Plan fromString(String s) { return null; }
+		}); // charge les plans dans la combobox
+		}
 
 	@Override
 	public void initialize(URL url, ResourceBundle bundle) {
@@ -116,7 +134,7 @@ public class VuePieceController implements Initializable {
 		spEtage.setValueFactory(vf);
 
 		// Type de pièce
-		cbTypePiece.setEditable(false);
+		cbTypePiece.setEditable(true);
 
 		cbTypePiece.setConverter(new StringConverter<TypePiece>() {
 
@@ -132,6 +150,7 @@ public class VuePieceController implements Initializable {
 				// TODO Auto-generated method stub
 				return null;
 			}
+			
 		});
 
 	}

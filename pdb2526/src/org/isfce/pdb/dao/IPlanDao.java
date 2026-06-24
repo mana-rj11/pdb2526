@@ -19,3 +19,4 @@ public interface IPlanDao {
 	
 	Plan insert(Plan obj, int installation) throws InstallationException;
 }
+

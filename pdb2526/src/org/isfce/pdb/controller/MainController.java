@@ -212,7 +212,7 @@ public class MainController extends Application {
 		try {
 			AnchorPane root = loader.load();
 			VuePlanController ctrl = loader.getController();
-			ctrl.setUpt(this, stage);
+			ctrl.setUp(this, stage);
 			// charge le Pane dans la stage
 			Scene scene = new Scene(root);
 			URL cssUrl = getClass().getResource("/org/isfce/pdb/view/css/pdb2526.css");

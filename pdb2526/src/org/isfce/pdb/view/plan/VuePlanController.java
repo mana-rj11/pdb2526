@@ -9,6 +9,8 @@ import org.isfce.pdb.model.Plan;
 import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -22,6 +24,8 @@ public class VuePlanController {
 	
 	private MainController ctrl;
 	private Stage stage;
+	@FXML
+	private Spinner<Integer> spEtage; // ajout etage 
 	
 	// Event Listener on Button.onAction
 	@FXML
@@ -39,7 +43,8 @@ public class VuePlanController {
 			try {
 				String fichier = ztNom.getText().trim();
 				String nom = fichier.replace(".png", "");
-				plan = new Plan(0, nom, fichier);
+				int etage = spEtage.getValue();	// il récupère l'etage du spinner
+				plan = new Plan(0, nom, fichier, etage);	// etage ajouté
 				this.ctrl.getFacade().insertPlan(plan);
 				this.stage.close();
 			} catch (InstallationException e) {
@@ -84,8 +89,11 @@ public class VuePlanController {
 	 * @param ctrl
 	 * @param stage
 	 */
-	public void setUpt(MainController ctrl, Stage stage) {
+	public void setUp(MainController ctrl, Stage stage) {
 		this.stage = stage;
 		this.ctrl = ctrl;
+		// Initialise le Spinner : étages de 0 à 10, défaut 0
+		spEtage.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 10, 0));
 	}
 }
+

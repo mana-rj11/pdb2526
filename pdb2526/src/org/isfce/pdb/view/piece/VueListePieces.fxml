@@ -29,6 +29,7 @@
                 <TableColumn fx:id="colEtage" prefWidth="75.0" text="%piece.etage" />
                 <TableColumn fx:id="colTypePiece" prefWidth="75.0" text="%piece.typePiece" />
                 <TableColumn fx:id="colOperation" prefWidth="75.0" text="%operation" />
+                <TableColumn fx:id="colPlan" text="Plan"/> 
               </columns>
                <columnResizePolicy>
                   <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />

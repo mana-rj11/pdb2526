@@ -68,6 +68,9 @@ public class VueListePiecesController implements Initializable {
 	@FXML
 	private TableColumn<Piece, TypePiece> colTypePiece;
 	@FXML
+	private TableColumn<Piece, String> colPlan;  // colonne PLAN
+	
+	@FXML
 	private TableView<Piece> tblPieces;
 	
 	private Stage stage;
@@ -148,11 +151,17 @@ public class VueListePiecesController implements Initializable {
 			p -> new SimpleObjectProperty<TypePiece>(p.getValue().getTypePiece()));
 		colEtage.setCellValueFactory(
 			p -> new SimpleObjectProperty<BigDecimal>(p.getValue().getEtage()));
+		colPlan.setCellValueFactory(p -> new ReadOnlyStringWrapper(
+			    p.getValue().getPlan() != null 
+			        ? p.getValue().getPlan().getNom() + " (ét." + p.getValue().getPlan().getEtage() + ")"
+			        : "Aucun plan"));	// ajouté
+		colPlan.setEditable(true);
 		
 		tblPieces.setEditable(true);
 		
 		// colonne NOM éditable
 		colNom.setEditable(true);
+		colPlan.setEditable(true);
 		colNom.setCellFactory(_ -> new TextFieldTableCell<Piece, String>(new DefaultStringConverter()) {
 			private TextField textField;
 			
@@ -203,12 +212,13 @@ public class VueListePiecesController implements Initializable {
 	});
 	
 	// colonne ETAGE avec Spinner
+	colPlan.setEditable(true);
 	colEtage.setEditable(true);
 	colEtage.setCellFactory(_ -> new TableCell<>() {
 		private final Spinner<Double> spinner = new Spinner<>(-5.0, 10.0, 0.0, 0.5);
 		private boolean updatingByPrgm = false;
 		{
-			spinner.setEditable(false);
+			spinner.setEditable(true);
 			spinner.valueProperty().addListener((_, _, newVal) -> {
 				if (updatingByPrgm || getIndex() < 0) return;
 				Piece piece = getTableView().getItems().get(getIndex());
@@ -257,6 +267,8 @@ public class VueListePiecesController implements Initializable {
 	// colonne OPERATION avec bouton supprimer 
 	colOperation.setSortable(false);
 	colOperation.setEditable(false);
+	colPlan.setEditable(true);
+			
 	colOperation.setCellFactory(_ -> new TableCell<>() {
 		final Button btDel = new Button();
 		final ImageView iconDel = new ImageView(new Image(
