@@ -7,10 +7,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 import org.isfce.pdb.controller.MainController;
 import org.isfce.pdb.exceptions.InstallationException;
@@ -88,6 +90,8 @@ public class VueImplantationController implements Initializable {
 	private Map<Integer, ObservableList<Element>> mapPlanElements = new HashMap<>();
 	// associe à un plan une Map (id élément -> Pièce) pour le filtre par pièce
 	private Map<Integer, Map<Integer, Piece>> mapPlanElementPiece = new HashMap<>();
+	
+	private Set<Integer> elementsModifies = new HashSet<>();
 
 	@FXML
 	void actionQuitter(ActionEvent event) {
@@ -101,13 +105,19 @@ public class VueImplantationController implements Initializable {
 		//TODO gérer la sauvegarde
 		if (ctrl.showConfirmation(I18N.getString("conf.save"))) {
 			try {
-				java.util.List<Element> tousLesElements = new java.util.ArrayList<>();
+				// Ne sauvegarde que les éléments modifiés
+				// java.util.List<Element> tousLesElements = new java.util.ArrayList<>();
+				List<Element> aMettre = new ArrayList<>();
 				for (var listeElements : mapPlanElements.values()) {
-					tousLesElements.addAll(listeElements);
+					for (Element el : listeElements) {
+						if (elementsModifies.contains(el.getId()))
+							aMettre.add(el);
+					}
 				}
-				ctrl.getFacade().sauvegarderImplantation(tousLesElements);
+				ctrl.getFacade().sauvegarderImplantation(aMettre);
+				elementsModifies.clear(); // reinitialise après sauvegarde
 				stage.hide();
-			} catch (org.isfce.pdb.exceptions.InstallationException e) {
+			} catch (InstallationException e) {
 				ctrl.showErreur(e.getMessage());
 			}
 		}
@@ -270,6 +280,7 @@ public class VueImplantationController implements Initializable {
 					mapPlanNodes.get(oPlanCharge.get().getId()).remove(oElementView.get());
 					//indique que l'élément n'est plus placé																
 					oElementView.get().getElement().getLocalisation().setPlace(false);
+					elementsModifies.add(elem.getId()); // marque comme modifié
 					lstElements.refresh(); // met a jour le style visuel
 					event.consume();
 				}
@@ -327,6 +338,7 @@ public class VueImplantationController implements Initializable {
 			Element elt = elementView.getElement();
 
 			elt.getLocalisation().setX(elementView.getTranslateX());
+			elementsModifies.add(elt.getId()); // marque comme modifié
 			elt.getLocalisation().setY(elementView.getTranslateY());
 
 			e.consume();
@@ -404,6 +416,7 @@ public class VueImplantationController implements Initializable {
 				// ajoute l'elementView aux elements du plan
 				mapPlanNodes.get(oPlanCharge.get().getId()).add(elementView);
 				element.getLocalisation().setPlace(true);//indique qu'il est placé
+				elementsModifies.add(element.getId()); // marque comme modifié
 				lstElements.refresh(); // met a jour le style visuel
 
 				elementView.setSelected(true);//sélectionne l'élément que l'on vient de mettre
