@@ -1,6 +1,7 @@
 package org.isfce.pdb.view.plan;
 
 import java.io.File;
+import java.math.BigDecimal;
 
 import org.isfce.pdb.controller.MainController;
 import org.isfce.pdb.exceptions.InstallationException;
@@ -43,7 +44,7 @@ public class VuePlanController {
 			try {
 				String fichier = ztNom.getText().trim();
 				String nom = fichier.replace(".png", "");
-				int etage = spEtage.getValue();	// il récupère l'etage du spinner
+				BigDecimal etage = new BigDecimal(spEtage.getValue()).setScale(1);	// il récupère l'etage du spinner
 				plan = new Plan(0, nom, fichier, etage);	// etage ajouté
 				this.ctrl.getFacade().insertPlan(plan);
 				this.stage.close();

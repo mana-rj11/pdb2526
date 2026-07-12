@@ -36,7 +36,7 @@ public class SQLPieceDao implements IPieceDao {
             """;
 
     private static String SQL_UPDATE = """
-            UPDATE TPIECE SET NOM_PIE = ?, DESCRIPTION_PIE = ?, ETAGE_PIE = ?, FKTYPE_PIE = ?
+            UPDATE TPIECE SET NOM_PIE = ?, DESCRIPTION_PIE = ?, ETAGE_PIE = ?, FKTYPE_PIE = ?, FKPLAN_PIE = ?
             WHERE NUM_PIE = ?
             """;
 
@@ -193,12 +193,17 @@ public class SQLPieceDao implements IPieceDao {
             ps.setString(2, obj.getDescription());
             ps.setBigDecimal(3, obj.getEtage());
             ps.setString(4, obj.getTypePiece().getCode());
-            ps.setInt(5, obj.getId());
+            // nouvelle modif
+            if (obj.getPlan() != null)
+            	ps.setInt(5, obj.getPlan().getId());
+            else
+            	ps.setNull(5, java.sql.Types.INTEGER);
+            ps.setInt(6, obj.getId());	// décalé de 5 à 6
             int nb = ps.executeUpdate();
             if (nb == 1) {
-               if  (!this.connexion.getAutoCommit())
-            	   this.connexion.commit();
-                ok = true;
+            	if (!this.connexion.getAutoCommit())
+            		this.connexion.commit();
+            	ok = true;
             }
         } catch (SQLException e) {
             log.error("Mise à jour non validée: " + e);

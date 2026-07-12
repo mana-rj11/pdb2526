@@ -1,5 +1,6 @@
 package org.isfce.pdb.dao;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -27,7 +28,10 @@ public class SQLPlanDao implements IPlanDao {
 	private Plan mapResultSet(ResultSet rs) throws Exception {
 			String fichier = rs.getString("NOM_PLA").trim();
 			String nom = fichier.replace(".png", "");
-		    int etage = rs.getInt("ETAGE_PLA");  // etage ajouté
+			// gere le cas ou ETAGE_PLA est null en base
+		    BigDecimal etage = rs.getBigDecimal("ETAGE_PLA");  // etage ajouté
+		    if (etage == null) etage = BigDecimal.ZERO;
+		    etage = etage.setScale(1);
 		    return new Plan(rs.getInt("ID_PLA"), nom, fichier, etage);	// etage ajouté
 
 	}
@@ -79,7 +83,7 @@ public class SQLPlanDao implements IPlanDao {
 				Statement.RETURN_GENERATED_KEYS)) {
 			ps.setString(1, obj.getFichier());
 			ps.setInt(2, installation); // sera fourni par la façade
-			ps.setInt(3, obj.getEtage());	// passe l'etage
+			ps.setBigDecimal(3, obj.getEtage());	// passe l'etage
 			ps.executeUpdate();
 			try (ResultSet rs = ps.getGeneratedKeys()) {
 				if (rs.next()) {

@@ -397,7 +397,7 @@ public class MainController extends Application {
 	}
 	
 	public void actionChargeInstallation(ActionEvent event) {
-		TextInputDialog textI = new TextInputDialog("1");
+		TextInputDialog textI = new TextInputDialog("3");
 		textI.setHeaderText(I18N.getString("inst.id"));
 		textI.showAndWait().ifPresent(s -> {
 			try {

@@ -13,6 +13,7 @@ import java.util.ResourceBundle;
 import org.isfce.pdb.controller.MainController;
 import org.isfce.pdb.exceptions.InstallationException;
 import org.isfce.pdb.model.Piece;
+import org.isfce.pdb.model.Plan;
 import org.isfce.pdb.model.TypePiece;
 import org.isfce.pdb.services.Facade;
 import org.isfce.pdb.view.bundle.I18N;
@@ -68,7 +69,7 @@ public class VueListePiecesController implements Initializable {
 	@FXML
 	private TableColumn<Piece, TypePiece> colTypePiece;
 	@FXML
-	private TableColumn<Piece, String> colPlan;  // colonne PLAN
+	private TableColumn<Piece, Plan> colPlan;  // colonne PLAN
 	
 	@FXML
 	private TableView<Piece> tblPieces;
@@ -78,6 +79,7 @@ public class VueListePiecesController implements Initializable {
 	private ObservableList<Piece> obsPieces;
 	private ObservableList<TypePiece> typePieces =
 		FXCollections.observableArrayList();
+	private ObservableList<Plan> listePlans = FXCollections.observableArrayList();
 	private Map<Integer, Piece> mapUpdate = new HashMap<>();
 	private BooleanProperty update = new SimpleBooleanProperty(false);
 	private Facade facade;
@@ -139,9 +141,19 @@ public class VueListePiecesController implements Initializable {
 		update.set(false);
 		mapUpdate.clear();
 		stage.setOnCloseRequest(_ -> fermeture());
+		listePlans.clear();
+		listePlans.add(null);	// option "Aucun plan"
+		try {
+			listePlans.addAll(facade.getListePlans());
+		} catch (InstallationException e) {
+			ctrl.showErreur(e.getMessage());
+		}
+		
 	}
 	
+	
 	@Override
+	//afficher le plan de la pièce
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		colNom.setCellValueFactory(
 			p -> new ReadOnlyStringWrapper(p.getValue().getNom()));
@@ -151,17 +163,43 @@ public class VueListePiecesController implements Initializable {
 			p -> new SimpleObjectProperty<TypePiece>(p.getValue().getTypePiece()));
 		colEtage.setCellValueFactory(
 			p -> new SimpleObjectProperty<BigDecimal>(p.getValue().getEtage()));
-		colPlan.setCellValueFactory(p -> new ReadOnlyStringWrapper(
-			    p.getValue().getPlan() != null 
-			        ? p.getValue().getPlan().getNom() + " (ét." + p.getValue().getPlan().getEtage() + ")"
-			        : "Aucun plan"));	// ajouté
-		colPlan.setEditable(true);
+		colPlan.setCellValueFactory(p -> new SimpleObjectProperty<>(
+			    p.getValue().getPlan()));
+		
+	// converter pour afficher le nom du plan
+	StringConverter<Plan> planConverter = new StringConverter<>() {
+		@Override
+		public String toString(Plan p) {
+			return p != null ? p.getNom()  + " (ét." + p.getEtage() + ")" : "Aucun plan";	// ajouté
+		}
+		@Override 
+		public Plan fromString (String s) { return null; }
+	};
+	
+	// comboBox editable dans chaque ligne
+	colPlan.setCellFactory(ComboBoxTableCell.forTableColumn(planConverter, listePlans));
+	colPlan.setEditable(true);
+
+	// Sauvegarde au changement
+	colPlan.setOnEditCommit(e -> {
+	    Piece piece = e.getRowValue();
+	    piece.setPlan(e.getNewValue());
+	    try {
+	        facade.updatePiece(piece);
+	    } catch (Exception ex) {
+	        ctrl.showErreur(ex.getMessage());
+	    }
+	});
+	
+	
+					
 		
 		tblPieces.setEditable(true);
+		colNom.setEditable(false);
+		colDescription.setEditable(false);
 		
 		// colonne NOM éditable
-		colNom.setEditable(true);
-		colPlan.setEditable(true);
+		// colNom.setEditable(true);
 		colNom.setCellFactory(_ -> new TextFieldTableCell<Piece, String>(new DefaultStringConverter()) {
 			private TextField textField;
 			

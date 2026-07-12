@@ -1,5 +1,7 @@
 package org.isfce.pdb.model;
 
+import java.math.BigDecimal;
+
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -13,7 +15,7 @@ public class Plan {
 	private final int id;
 	private final String nom;
 	private final String fichier;
-    private final int etage; // etage ajouté
+    private final BigDecimal etage; // etage ajouté
 
 
 }
