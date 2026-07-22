@@ -202,18 +202,7 @@ public class Facade {
 	 * Retourne les ...
 	 */
 	public List<Element> getElementsPlan(Plan plan) throws InstallationException {
-		List<Element> tous = getListeElements();
-		List<Piece> piecesDuPlan = getListePieces().stream()
-				.filter(p -> p.getPlan() != null && p.getPlan().getId() == plan.getId())
-				.toList();
-		List<Element> resultat = new java.util.ArrayList<>();
-		for (Element e : tous) {
-			Integer idPiece = getPieceIdAssignee(e);
-			if (idPiece != null && piecesDuPlan.stream().anyMatch(p -> p.getId().equals(idPiece))) {
-				resultat.add(e);
-			}
-		} 
-		return resultat;
+		return factory.getElementDAO().getListeFromPlan(plan.getId());
 	}
 	
 	public java.util.Properties getProperties() {

@@ -12,5 +12,6 @@ import org.isfce.pdb.model.Element;
 public interface IElementDao {
 	
 	List<Element> getListeFromInstallation(int installation) throws InstallationException;
-
+	// charge les éléments associés à un plan via pièce et localisation
+	List<Element> getListeFromPlan(int idPlan);
 }
