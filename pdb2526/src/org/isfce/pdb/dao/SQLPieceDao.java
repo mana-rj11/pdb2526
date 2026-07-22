@@ -85,7 +85,7 @@ public class SQLPieceDao implements IPieceDao {
                 log.debug("Une pièce est chargée: " + obj);
             }
         } catch (SQLException | InstallationException e) {
-            log.error(e.getMessage());
+            log.error("getFromID ERREUR: " + e.getMessage());
         }
         return Optional.ofNullable(obj);
     }

@@ -26,14 +26,12 @@ public class SQLPlanDao implements IPlanDao {
 	}
 	
 	private Plan mapResultSet(ResultSet rs) throws Exception {
-			String fichier = rs.getString("NOM_PLA").trim();
-			String nom = fichier.replace(".png", "");
-			// gere le cas ou ETAGE_PLA est null en base
-		    BigDecimal etage = rs.getBigDecimal("ETAGE_PLA");  // etage ajouté
-		    if (etage == null) etage = BigDecimal.ZERO;
-		    etage = etage.setScale(1);
-		    return new Plan(rs.getInt("ID_PLA"), nom, fichier, etage);	// etage ajouté
-
+			String nom = rs.getString("NOM_PLA").trim();			// le vrai nom
+			String fichier = rs.getString("FICHIER_PLA").trim();	// le nom du fichier
+			BigDecimal etage = rs.getBigDecimal("ETAGE_PLA");
+			if (etage == null) etage = BigDecimal.ZERO;
+			etage = etage.setScale(1);
+			return new Plan(rs.getInt("ID_PLA"), nom, fichier, etage);
 	}
 	
 	@Override
@@ -77,13 +75,14 @@ public class SQLPlanDao implements IPlanDao {
 
 	@Override
 	public Plan insert(Plan obj, int installation) throws InstallationException {
-		String sql = "INSERT INTO TPLAN (NOM_PLA, FKINSTALLATION_PLA, ETAGE_PLA) VALUES (?, ?, ?)"; // 3e paramètre
+		String sql = "INSERT INTO TPLAN (NOM_PLA, FICHIER_PLA, FKINSTALLATION_PLA, ETAGE_PLA) VALUES (?, ?, ?, ?)"; // 3e paramètre
 		Connection connect = factory.getConnection();
 		try (PreparedStatement ps = connect.prepareStatement(sql,
 				Statement.RETURN_GENERATED_KEYS)) {
-			ps.setString(1, obj.getFichier());
-			ps.setInt(2, installation); // sera fourni par la façade
-			ps.setBigDecimal(3, obj.getEtage());	// passe l'etage
+			ps.setString(1, obj.getNom());			// le nom
+			ps.setString(2, obj.getFichier()); 		// le fichier
+			ps.setInt(3, installation);
+			ps.setBigDecimal(4, obj.getEtage());	// passe l'etage
 			ps.executeUpdate();
 			try (ResultSet rs = ps.getGeneratedKeys()) {
 				if (rs.next()) {
