@@ -2,6 +2,9 @@ package org.isfce.pdb.view.plan;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 import org.isfce.pdb.controller.MainController;
 import org.isfce.pdb.exceptions.InstallationException;
@@ -15,6 +18,8 @@ import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
 
 public class VuePlanController {
 	//pseudo classe pour les erreurs
@@ -63,9 +68,32 @@ public class VuePlanController {
 		fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Images", "*.png", "*.jpg"));
 		// ouvre la boîte du dialogue
 		File file = fc.showOpenDialog(stage);
+		
 		// si l'user a sélectionné un fichier, met le nom dans le champ
 		if (file != null) {
-			ztNom.setText(file.getName());
+			try {
+				// récupère le dossier de destination (imagesPath + installationId)
+				String basePath = ctrl.getFacade().getProperties().getProperty("imagesPath")
+					+ ctrl.getFacade().getCurrentInstallation().getId() + "/";
+				Path destination = Path.of(basePath + file.getName());
+				
+				// copie le fichier dans le répertoire de l'installation
+				Files.copy(file.toPath(), destination, StandardCopyOption.REPLACE_EXISTING);
+				log.info("Fichier copié vers : " + destination);
+				
+				// mettre le nom du fichier dans le champ
+				ztNom.setText(file.getName());
+			} catch (Exception e) {
+				ctrl.showErreur("Erreur lors de la copie : " + e.getMessage());
+				log.error("Copie fichier échouée : " + e.getMessage());
+			}
+			
+			
+			
+			
+			
+			
+			
 		}
 	}
 	
