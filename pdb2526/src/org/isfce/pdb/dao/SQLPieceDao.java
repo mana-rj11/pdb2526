@@ -21,12 +21,12 @@ import lombok.extern.slf4j.Slf4j;
 public class SQLPieceDao implements IPieceDao {
 
     private static String SQL_GET_FROM_ID = """
-            SELECT NOM_PIE, DESCRIPTION_PIE, ETAGE_PIE, FKTYPE_PIE, FKINSTALLATION_PIE, FKPLAN_PIE
+            SELECT NOM_PIE, DESCRIPTION_PIE, ETAGE_PIE, FKTYPE_PIE, FKINSTALLATION_PIE, FKPLAN_PIE, X_NOM_PIE, Y_NOM_PIE
             FROM TPIECE WHERE NUM_PIE = ?
             """;
 
     private static String SQL_GET_LISTE_FROM_INST = """
-            SELECT NUM_PIE, NOM_PIE, DESCRIPTION_PIE, ETAGE_PIE, FKTYPE_PIE, FKPLAN_PIE
+            SELECT NUM_PIE, NOM_PIE, DESCRIPTION_PIE, ETAGE_PIE, FKTYPE_PIE, FKPLAN_PIE, X_NOM_PIE, Y_NOM_PIE
             FROM TPIECE WHERE FKINSTALLATION_PIE=? ORDER BY ETAGE_PIE, FKTYPE_PIE
             """;
 
@@ -36,7 +36,7 @@ public class SQLPieceDao implements IPieceDao {
             """;
 
     private static String SQL_UPDATE = """
-            UPDATE TPIECE SET NOM_PIE = ?, DESCRIPTION_PIE = ?, ETAGE_PIE = ?, FKTYPE_PIE = ?, FKPLAN_PIE = ?
+            UPDATE TPIECE SET NOM_PIE = ?, DESCRIPTION_PIE = ?, ETAGE_PIE = ?, FKTYPE_PIE = ?, FKPLAN_PIE = ?, X_NOM_PIE = ?, Y_NOM_PIE = ?
             WHERE NUM_PIE = ?
             """;
 
@@ -66,11 +66,12 @@ public class SQLPieceDao implements IPieceDao {
                 String typeCode = rs.getString("FKTYPE_PIE");
                 int instId = rs.getInt("FKINSTALLATION_PIE");
                 Integer fkPlan = (Integer) rs.getObject("FKPLAN_PIE");
+                double xNom = rs.getDouble("X_NOM_PIE");	// new
+                double yNom = rs.getDouble("Y_NOM_PIE");	// new
                 // rs peut fermé maintenant
                 
                 // résoudre les objets liés
-                TypePiece tp = factory.getTypePieceDAO().getFromID(typeCode).get();	// cahce est ok
-
+                TypePiece tp = factory.getTypePieceDAO().getFromID(typeCode).get();	// cache est ok
                 Plan plan = resolvePlan(fkPlan);	// ouvre un 2e curseur 
 
                 obj = Piece.builder()
@@ -81,11 +82,14 @@ public class SQLPieceDao implements IPieceDao {
                         .typePiece(tp)
                         .installation(instId)
                         .plan(plan)
+                        .xNom(xNom)
+                        .yNom(yNom)
                         .build();
                 log.debug("Une pièce est chargée: " + obj);
             }
         } catch (SQLException | InstallationException e) {
             log.error("getFromID ERREUR: " + e.getMessage());
+            e.printStackTrace();
         }
         return Optional.ofNullable(obj);
     }
@@ -96,7 +100,7 @@ public class SQLPieceDao implements IPieceDao {
      * la même connexion (sinon Firebird ferme implicitement le curseur).
      */
     private record RawPiece(int id, String nom, String description, BigDecimal etage,
-                              String typeCode, Integer fkPlan) {
+                              String typeCode, Integer fkPlan, double xNom, double yNom) {
     }
 
     @Override
@@ -115,7 +119,10 @@ public class SQLPieceDao implements IPieceDao {
                         rs.getString("DESCRIPTION_PIE"),
                         rs.getBigDecimal("ETAGE_PIE").setScale(1),
                         rs.getString("FKTYPE_PIE"),
-                        (Integer) rs.getObject("FKPLAN_PIE")));
+                        (Integer) rs.getObject("FKPLAN_PIE"),
+                        rs.getDouble("X_NOM_PIE"),	// new
+                        rs.getDouble("Y_NOM_PIE")	// new
+                ));
             }
         } catch (SQLException e) {
             log.error("Problème lors du chargement de la liste des Pièces: " + e.getMessage(), e);
@@ -135,6 +142,8 @@ public class SQLPieceDao implements IPieceDao {
                         .typePiece(tp)
                         .installation(installation)
                         .plan(plan)
+                        .xNom(r.xNom())		// new
+                        .yNom(r.yNom())		// new
                         .build();
                 liste.add(obj);
             } catch (InstallationException e) {
@@ -198,7 +207,9 @@ public class SQLPieceDao implements IPieceDao {
             	ps.setInt(5, obj.getPlan().getId());
             else
             	ps.setNull(5, java.sql.Types.INTEGER);
-            ps.setInt(6, obj.getId());	// décalé de 5 à 6
+            ps.setDouble(6, obj.getXNom());
+            ps.setDouble(7, obj.getYNom());
+            ps.setInt(8, obj.getId());	// décalé de 6 à 8
             int nb = ps.executeUpdate();
             if (nb == 1) {
             	if (!this.connexion.getAutoCommit())

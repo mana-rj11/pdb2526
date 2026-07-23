@@ -20,4 +20,6 @@ public class Piece {
 	private TypePiece typePiece;
 	private final Integer installation;
 	private Plan plan;
+	private double xNom;	// position X du nom sur le plan 
+	private double yNom;	// position Y du nom sur le plan 
 }
