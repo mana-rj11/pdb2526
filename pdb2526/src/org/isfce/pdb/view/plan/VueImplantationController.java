@@ -41,6 +41,9 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import lombok.extern.slf4j.Slf4j;
@@ -80,6 +83,9 @@ public class VueImplantationController implements Initializable {
 	private MainController ctrl;
 
 	private Facade facade;
+	
+	//toggle pour afficher/masquer les noms
+	private boolean afficherNomsPieces = true;
 
 	private Optional<Plan> oPlanCharge = Optional.empty();
 	// associe à un plan son canvas
@@ -90,6 +96,8 @@ public class VueImplantationController implements Initializable {
 	private Map<Integer, ObservableList<Element>> mapPlanElements = new HashMap<>();
 	// associe à un plan une Map (id élément -> Pièce) pour le filtre par pièce
 	private Map<Integer, Map<Integer, Piece>> mapPlanElementPiece = new HashMap<>();
+	// map pour stocker les text des noms de pièces par plan
+	private Map<Integer, List<Text>> mapPlanPieceNames = new HashMap<>();
 	
 	private Set<Integer> elementsModifies = new HashSet<>();
 
@@ -115,9 +123,21 @@ public class VueImplantationController implements Initializable {
 					}
 				}
 				ctrl.getFacade().sauvegarderImplantation(aMettre);
+				// sauvegarde les positions des noms de pièces
+				for (var pieces : mapPlanElementPiece.values()) {
+					Set<Integer> dejaVu = new HashSet<>();
+					for (Piece piece : pieces.values()) {
+						if (piece != null && dejaVu.add(piece.getId())) {
+							if (piece.getXNom() > 0 || piece.getYNom() > 0)
+								ctrl.getFacade().updatePiece(piece);
+						}
+					}
+				}
 				elementsModifies.clear(); // reinitialise après sauvegarde
 				stage.hide();
 			} catch (InstallationException e) {
+				ctrl.showErreur(e.getMessage());
+			} catch (Exception e) {
 				ctrl.showErreur(e.getMessage());
 			}
 		}
@@ -143,6 +163,14 @@ public class VueImplantationController implements Initializable {
 
 			// dessine les éléments déjà placés
 			pane.getChildren().addAll(mapPlanNodes.get(planCharge.getId()));
+			// crée les nom des pièces
+			if(!mapPlanPieceNames.containsKey(planCharge.getId())) {
+				mapPlanPieceNames.put(planCharge.getId(), creePieceNames(planCharge.getId()));
+			}
+			// affiche les nom si le toggle est activé
+			if (afficherNomsPieces) {
+				pane.getChildren().addAll(mapPlanPieceNames.get(planCharge.getId()));
+			}
 			
 			// met à jour le filtre par pièce pour ce plan
 			ObservableList<Piece> piecesDuPlan = FXCollections.observableArrayList();
@@ -170,6 +198,22 @@ public class VueImplantationController implements Initializable {
 							.filter(e -> filtre.equals(elementPieceMap.get(e.getId())))
 							.toList());
 			lstElements.setItems(filtres);
+		}
+	}
+	/**
+	 * Active/désactive l'affichage des noms de pièces
+	 */
+	@FXML
+	void actionToggleNoms(ActionEvent event) {
+		afficherNomsPieces = !afficherNomsPieces;
+		if (oPlanCharge.isPresent()) {
+			List<Text> names = mapPlanPieceNames.get(oPlanCharge.get().getId());
+			if (names != null) {
+				if (afficherNomsPieces)
+					pane.getChildren().addAll(names);
+				else
+					pane.getChildren().removeAll(names);
+			}
 		}
 	}
 	
@@ -484,6 +528,61 @@ public class VueImplantationController implements Initializable {
 		elementView.setTranslateY(element.getLocalisation().getY());
 		moveBehaviour(elementView);
 		return elementView;
+	}
+	
+	/**
+	 * Crée les Text des noms de pièces pour un plan donné
+	 */
+	private List<Text> creePieceNames(int planId) {
+		List<Text> names = new ArrayList<>();
+		// récupère les pièces distinctes de ce plan
+		Map<Integer, Piece> pieces = mapPlanElementPiece.get(planId);
+		if (pieces == null) return names;
+		
+		Set<Integer> dejaVu = new HashSet<>();
+		for (Piece piece : pieces.values()) {
+			if (piece != null && dejaVu.add(piece.getId())) {
+				Text txt = new Text(piece.getNom());
+				txt.setFont(Font.font("Georgia", javafx.scene.text.FontWeight.BOLD, 16));
+				txt.setFill(Color.BLACK);
+				txt.setFill(Color.web("#623BFF"));	// Bleu
+				// txt.setStroke(Color.WHITE); 		// contour blanc pour la lisibilité
+				txt.setStrokeWidth(0.4);
+				txt.setStyle("-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 3, 0, 1, 1);");
+				// position : utilise les coordonnées sauvegardées ou (50, 50) par défaut
+				double x = piece.getXNom() > 0 ? piece.getXNom() : 20;
+				double y = piece.getYNom() > 0 ? piece.getYNom() : 30 + (dejaVu.size() * 25);
+				txt.setTranslateX(x);
+				txt.setTranslateY(y);
+				
+				// drag-and-drop pour repositionner le nom
+				final Piece p = piece;
+				txt.setOnMousePressed(ev -> {
+					txt.setUserData(new double[]{
+						ev.getSceneX() - txt.getTranslateX(),
+						ev.getSceneY() - txt.getTranslateY()
+					});
+					ev.consume();
+				});
+				txt.setOnMouseDragged(ev -> {
+					double[] delta = (double[]) txt.getUserData();
+					txt.setTranslateX(ev.getSceneX() - delta[0]);
+					txt.setTranslateY(ev.getSceneY() - delta[1]);
+					ev.consume();
+				});
+				txt.setOnMouseReleased(ev -> {
+					// sauvegarde la position dans l'objet Piece
+					p.setXNom(txt.getTranslateX());
+					p.setYNom(txt.getTranslateY());
+					elementsModifies.add(-p.getId());	// négatif pour distinguer des éléments
+					ev.consume();
+				});
+				
+				txt.setCursor(javafx.scene.Cursor.MOVE);
+				names.add(txt);
+			}
+		}
+		return names;
 	}
 
 }
