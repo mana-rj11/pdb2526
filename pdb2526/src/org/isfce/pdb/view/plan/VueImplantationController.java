@@ -100,6 +100,11 @@ public class VueImplantationController implements Initializable {
 	private Map<Integer, List<Text>> mapPlanPieceNames = new HashMap<>();
 	
 	private Set<Integer> elementsModifies = new HashSet<>();
+	
+	// Zoom
+	private double zoom = 1.0;		// niveau de zoom actuel
+	private double zoomMin = 0.3;	// zoom minimum
+	private double zoomMax = 3.0; 	// zoom maximum
 
 	@FXML
 	void actionQuitter(ActionEvent event) {
@@ -177,7 +182,10 @@ public class VueImplantationController implements Initializable {
 			piecesDuPlan.add(null); // toutes les pièces
 			piecesDuPlan.addAll(mapPlanElementPiece.get(planCharge.getId()).values().stream().distinct().toList());
 			cbPieces.setItems(piecesDuPlan);
-			cbPieces.getSelectionModel().select(null); // pas de filtre par défaut 
+			cbPieces.getSelectionModel().select(null); // pas de filtre par défaut
+			// reinitialise le zoom
+			zoom = 1.0;
+			zoomer();
 
 		}
 
@@ -215,6 +223,24 @@ public class VueImplantationController implements Initializable {
 					pane.getChildren().removeAll(names);
 			}
 		}
+	}
+	
+	@FXML
+	void actionZoomIn(ActionEvent event) {
+		zoom = Math.min(zoomMax, zoom + 0.1);
+		zoomer();
+	}
+	
+	@FXML
+	void actionZoomOut(ActionEvent event) {
+		zoom = Math.max(zoomMin, zoom - 0.1);
+		zoomer();
+	}
+	
+	@FXML
+	void actionZoomReset(ActionEvent event) {
+		zoom = 1.0;
+		zoomer();
 	}
 	
 	
@@ -265,6 +291,15 @@ public class VueImplantationController implements Initializable {
 						cbPlans.getItems().remove(p);
 					}
 				}
+				// Zoom avec CTRL + molette de la souris
+				scpCanvas.addEventFilter(javafx.scene.input.ScrollEvent.SCROLL, event -> {
+					if (event.isControlDown()) {
+						double delta = event.getDeltaY() > 0 ? 0.1 : -0.1;
+						zoom = Math.max(zoomMin, Math.min(zoomMax, zoom + delta));
+						zoomer();
+						event.consume();
+					}
+				});
 			}
 			
 			cbPlans.setConverter(new StringConverter<Plan>() {
@@ -356,6 +391,7 @@ public class VueImplantationController implements Initializable {
 		elementView.setOnMousePressed(e -> {
 			// décalage entre la position de la souris sur la scene et la
 			// translation dans le Pane 
+			// Multiple par le zomm pour le delta
 			delta.x = e.getSceneX() - elementView.getTranslateX();
 			delta.y = e.getSceneY() - elementView.getTranslateY();
 			elementView.toFront();
@@ -364,12 +400,14 @@ public class VueImplantationController implements Initializable {
 			//==> le déplacement graphique sélectionne l'élément ds la liste
 			lstElements.getSelectionModel().select(elementView.getElement());
 			e.consume();
+			
 		});
 
 		elementView.setOnMouseDragged(e -> {
 			// Calcule la nouvelle translation
-			double x = e.getSceneX() - delta.x;
-			double y = e.getSceneY() - delta.y;
+			double x = e.getSceneX() / zoom - delta.x;
+			double y = e.getSceneY() / zoom - delta.y;
+			
 
 			elementView.setTranslateX(x);
 			elementView.setTranslateY(y);
@@ -380,7 +418,6 @@ public class VueImplantationController implements Initializable {
 		elementView.setOnMouseReleased(e -> {
 
 			Element elt = elementView.getElement();
-
 			elt.getLocalisation().setX(elementView.getTranslateX());
 			elementsModifies.add(elt.getId()); // marque comme modifié
 			elt.getLocalisation().setY(elementView.getTranslateY());
@@ -583,6 +620,14 @@ public class VueImplantationController implements Initializable {
 			}
 		}
 		return names;
+	}
+	
+	/**
+	 * Applique le zoom sur le plan
+	 */
+	private void zoomer() {
+		pane.setScaleX(zoom);
+		pane.setScaleY(zoom);
 	}
 
 }

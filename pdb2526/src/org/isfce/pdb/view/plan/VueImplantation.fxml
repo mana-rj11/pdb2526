@@ -15,6 +15,7 @@
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.CheckBox?>
 
+
 <BorderPane prefHeight="737.0" prefWidth="1122.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.isfce.pdb.view.plan.VueImplantationController">
    <center>
       <ScrollPane fx:id="scpCanvas" fitToHeight="true" fitToWidth="true" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
@@ -54,6 +55,14 @@
 <Separator style="-fx-padding: 5 0 5 0;"/>
 <ListView fx:id="lstElements" prefHeight="585.0" prefWidth="200.0" />
 <CheckBox fx:id="cbAfficherNoms" text="Afficher noms" selected="true" onAction="#actionToggleNoms"/>
+<Separator style="-fx-padding: 5 0 5 0;"/>
+<HBox spacing="5" alignment="CENTER">
+	<children>
+		<Button text="-" onAction="#actionZoomOut" prefWidth="30"/>
+		<Button text="1:1" onAction="#actionZoomReset" prefWidth="35"/>
+		<Button text="+" onAction="#actionZoomIn" prefWidth="30"/>
+	</children>
+</HBox>
         </children>
     </VBox>
 </left>
