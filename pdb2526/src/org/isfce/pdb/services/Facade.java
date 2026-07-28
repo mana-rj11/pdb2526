@@ -77,6 +77,10 @@ public class Facade {
 		return factory.getTypePieceDAO().getListe(null);
 	}
 	
+	public List<Installation> getListeInstallations() throws InstallationException {
+		return factory.getInstallationDAO().getListe();
+	}
+	
 	/**
 	 * Ajoute d'une nouvelle pièce  
 	 */

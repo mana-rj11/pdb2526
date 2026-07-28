@@ -3,6 +3,7 @@ package org.isfce.pdb.controller;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -13,6 +14,7 @@ import org.isfce.pdb.databases.connexion.ConnexionFromFile;
 import org.isfce.pdb.databases.connexion.ConnexionSingleton;
 import org.isfce.pdb.databases.uri.Databases;
 import org.isfce.pdb.exceptions.InstallationException;
+import org.isfce.pdb.model.Installation;
 import org.isfce.pdb.services.Facade;
 import org.isfce.pdb.view.bundle.I18N;
 import org.isfce.pdb.view.element.VueListeElementsController;
@@ -25,6 +27,7 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -33,7 +36,9 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
@@ -397,20 +402,113 @@ public class MainController extends Application {
 	}
 	
 	public void actionChargeInstallation(ActionEvent event) {
-		TextInputDialog textI = new TextInputDialog("3");
-		textI.setHeaderText(I18N.getString("inst.id"));
-		textI.showAndWait().ifPresent(s -> {
-			try {
-				Integer i = Integer.parseInt(s);
-				facade.chargeInstallation(i);
-				installationChargee.set(true);
-			} catch (InstallationException e) {
-				showErreur(e.getMessage());
-			} catch (NumberFormatException e2) {
-				showErreur("Doit être un entier");
+		try {
+			// charge la liste des installations depuis la BD
+			List<Installation> installations = facade.getListeInstallations();
+			
+			if (installations.isEmpty()) {
+				showErreur("Aucune installation trouvée en base de données");
+				return;
 			}
-		});
+			
+			// crée un dialog avec une ListeView
+			Dialog<Installation> dialog = new Dialog<>();
+			dialog.setTitle("Sélection d'une installation");
+			dialog.setHeaderText("Double-cliquez sur une installation pour la charger");
+			// style cohérent avec l'app
+			dialog.getDialogPane().setStyle("-fx-font-family: Georgia;");
+			
+			// ListeView des installations
+			ListView<Installation> lvInstallations = new ListView<>();
+			lvInstallations.setItems(FXCollections.observableArrayList(installations));
+			lvInstallations.setPrefSize(500, 300);
+			// style cohérent avec l'app
+			lvInstallations.setStyle(
+				"-fx-font-size: 13px;" +
+				"-fx-selection-bar: #4FC3F7;" +
+				"-fx-selection-bar-non-focused: #B3E5FC;");
+			
+			// affichage personnalisé de chaque ligne 
+			lvInstallations.setCellFactory(lv -> new ListCell<Installation>() {
+				@Override
+				protected void updateItem(Installation inst, boolean empty) {
+					super.updateItem(inst, empty);
+					if (empty || inst == null) {
+						setText(null);
+					} else {
+						setText("Installation n°" + inst.getId()
+							+ " | " + inst.getDate()
+							+ " | " + inst.getProprietaire()
+							+ " | " + inst.getAdresse().getRue()
+							+ ", " + inst.getAdresse().getCp()
+							+ " " + inst.getAdresse().getVille());
+						
+						// style de base 
+						// String bgColor = getIndex() % 2 == 0 ? "#E1F5FE" : "white";
+					// 	setStyle("-fx-padding: 8; -fx-font-family: Georgia; -fx-font-size: 13px; -fx-background-color: " + bgColor + ";");
+						
+						// setStyle(baseStyle + "-fx-background-color: " + bgColor + ";");
+						// setTextFill(Color.BLACK);
+	
+					}
+				}
+			}); 
+					
+			// double clic pour charger
+			lvInstallations.setOnMouseClicked(e -> {
+				if (e.getClickCount() == 2 && lvInstallations.getSelectionModel().getSelectedItem() != null) {
+					dialog.setResult(lvInstallations.getSelectionModel().getSelectedItem());
+					dialog.close();
+				}
+			});
+			
+			dialog.getDialogPane().getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
+			dialog.getDialogPane().setContent(lvInstallations);
+			
+			// récupère le resultat via OK aussi
+			dialog.setResultConverter(bt -> {
+				if (bt == ButtonType.OK)
+					return lvInstallations.getSelectionModel().getSelectedItem();
+				return null;
+			});
+			
+			// double clic pour charger
+	        lvInstallations.setOnMouseClicked(e -> {
+	            if (e.getClickCount() == 2 && lvInstallations.getSelectionModel().getSelectedItem() != null) {
+	                dialog.setResult(lvInstallations.getSelectionModel().getSelectedItem());
+	                dialog.close();
+	            }
+	        });
+
+	        dialog.getDialogPane().getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
+	        dialog.getDialogPane().setContent(lvInstallations);
+	        dialog.getDialogPane().getStylesheets().add(
+	        	getClass().getResource("/org/isfce/pdb/view/css/pdb2526.css").toExternalForm());
+	        
+
+	        dialog.setResultConverter(bt -> {
+	            if (bt == ButtonType.OK)
+	                return lvInstallations.getSelectionModel().getSelectedItem();
+	            return null;
+	        });
+			
+			// affiche et traite le résultat 
+			Optional<Installation> result = dialog.showAndWait();
+			result.ifPresent(inst -> {
+				try {
+					facade.chargeInstallation(inst.getId());
+					installationChargee.set(true);
+				} catch (InstallationException ex) {
+					showErreur(ex.getMessage());
+				}
+			});
+			
+		} catch (InstallationException e) {
+			showErreur(e.getMessage());
+		}
 	}
+			
+			
 	
 	public void actionCreePiece(ActionEvent event) {
 		showAddPiece();

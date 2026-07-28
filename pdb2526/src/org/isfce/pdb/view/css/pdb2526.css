@@ -77,3 +77,23 @@
     -fx-font-family: 'Georgia';
     -fx-font-size: 13px;
 }
+
+/* Style ListView installations */
+.list-cell:odd {
+    -fx-background-color: #E1F5FE;
+    -fx-padding: 8;
+}
+.list-cell:even {
+    -fx-background-color: white;
+    -fx-padding: 8;
+}
+.list-cell:hover {
+    -fx-background-color: #B3E5FC;
+}
+.list-cell:selected {
+    -fx-background-color: #4FC3F7;
+    -fx-text-fill: white;
+}
+.list-cell:selected:hover {
+    -fx-background-color: #29B6F6;
+}
