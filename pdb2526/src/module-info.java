@@ -7,6 +7,7 @@ module pdb2526 {
 	requires transitive javafx.graphics;
 	requires java.base;
 	requires lombok;
+	requires java.desktop;
 	
 	opens org.isfce.pdb.controller to javafx.fxml, javafx.graphics;
 	opens org.isfce.pdb.view.piece to javafx.fxml,  javafx.graphics;
