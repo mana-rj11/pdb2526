@@ -376,6 +376,21 @@ public class VueImplantationController implements Initializable {
 		} catch (InstallationException e) {
 			ctrl.showErreur(I18N.getString("err.noInstall"));
 		}
+		
+		// ecoute l'ajout de pièces/plans pour rafraichir 
+		ctrl.getFacade().addPropertyChangeListener(evt -> {
+			javafx.application.Platform.runLater(() -> {
+				if (evt.getPropertyName().equals(Facade.EVT_PLAN_AJOUTEE)) {
+					try {
+						// rafraichit la liste des plans 
+						cbPlans.setItems(FXCollections.observableArrayList(
+							ctrl.getFacade().getListePlans()));
+					} catch (InstallationException e) {
+						log.error("Erreur refresh plans: " + e.getMessage());
+					}
+				}
+			});
+		});
 	}
 
 	/**

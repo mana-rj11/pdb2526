@@ -25,6 +25,8 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
 
 public class VueListeElementsController implements Initializable {
 	
@@ -94,6 +96,21 @@ public class VueListeElementsController implements Initializable {
 		this.ctrl = ctrl;
 		this.facade = ctrl.getFacade();
 		chargerDonnees();
+		// ecoute les changements de pièces pour rafraichir la liste 
+		facade.addPropertyChangeListener(evt -> {
+			if (evt.getPropertyName().equals(Facade.EVT_PIECE_AJOUTEE)
+				|| evt.getPropertyName().equals(Facade.EVT_PIECE_SUPPRIMEE)) {
+				// Rafraichit la liste des pièces dans la combobox
+				javafx.application.Platform.runLater(() -> {
+					try {
+						listePieces.setAll(facade.getListePieces());
+					} catch (Exception e) {
+						log.error("Erreur refresh pièces: " + e.getMessage());
+					}
+				});
+			}
+				
+		});
 	}
 	
 	@Override

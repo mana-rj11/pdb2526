@@ -149,6 +149,16 @@ public class VueListePiecesController implements Initializable {
 			ctrl.showErreur(e.getMessage());
 		}
 		
+		// ecoute les ajouts/suppressions de pièces pour rafraichir
+		facade.addPropertyChangeListener(evt -> {
+			if (evt.getPropertyName().equals(Facade.EVT_PIECE_AJOUTEE)
+				|| evt.getPropertyName().equals(Facade.EVT_PIECE_SUPPRIMEE)) {
+				javafx.application.Platform.runLater(() -> {
+					obsPieces.setAll(facade.getListePieces());
+				});
+			}
+		});
+		
 	}
 	
 	

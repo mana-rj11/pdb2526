@@ -1,5 +1,7 @@
 package org.isfce.pdb.services;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,6 +25,24 @@ public class Facade {
 	// private List<Piece> pieces = new ArrayList<Piece>();
 	// élements de l'installation
 	// private List<Element> elements;
+	
+	// publication des changements
+	private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+	
+	// constantes pour les événements
+	public static final String EVT_PIECE_AJOUTEE = "pieceAjoutee";
+	public static final String EVT_PIECE_SUPPRIMEE = "pieceSuprimee";
+	public static final String EVT_PIECE_MODIFIEE = "pieceModifiee";
+	public static final String EVT_PLAN_AJOUTEE = "planAjoutee";
+	public static final String EVT_ELEMENT_ASSIGNEE = "elementAssignee";
+	
+	public void addPropertyChangeListener(PropertyChangeListener listener) {
+		pcs.addPropertyChangeListener(listener);
+	}
+	
+	public void removePropertyChangeListener(PropertyChangeListener listener) {
+		pcs.removePropertyChangeListener(listener);
+	}
 
 	public Facade(DAOFactory factory) {
 		this.factory=factory;
@@ -62,7 +82,9 @@ public class Facade {
 	 * Ajoute un nouveau plan \u00e0 l'installation courante
 	 */
 	public Plan insertPlan(Plan plan) throws InstallationException {
-		return factory.getPlanDAO().insert(plan, getCurrentInstallation().getId());
+		Plan p = factory.getPlanDAO().insert(plan, getCurrentInstallation().getId());
+		pcs.firePropertyChange(EVT_PLAN_AJOUTEE, null, p);   // PUBLIE
+		return p;
 	}
 	
 	// -----------------------------------------------------------
@@ -87,6 +109,7 @@ public class Facade {
 	public void insertPiece(Piece piece) throws InstallationException {
 		try {
 			factory.getPieceDAO().insert(piece);
+			pcs.firePropertyChange(EVT_PIECE_AJOUTEE, null, piece); // PUBLIE
 			// pieces.add(piece);
 		} catch (Exception e) {
 			if (e instanceof InstallationException exception)
@@ -114,6 +137,7 @@ public class Facade {
 		boolean ok = false;
 		try {
 			ok = factory.getPieceDAO().delete(obj);
+			if (ok) pcs.firePropertyChange(EVT_PIECE_SUPPRIMEE, obj, null);  // PUBLIE
 		} catch (Exception e) {
 			if (e instanceof InstallationException exc)
 				throw exc;
@@ -128,6 +152,7 @@ public class Facade {
 		boolean ok = false;
 		try {
 			ok = factory.getPieceDAO().update(piece);
+			if (ok) pcs.firePropertyChange(EVT_PIECE_MODIFIEE, null, piece);	// PUBLIE
 		} catch (Exception e) {
 			if (e instanceof InstallationException exc)
 				throw exc;
@@ -182,6 +207,7 @@ public class Facade {
 			factory.getLocalisationDAO().delete(element.getId());
 		Localisation nouvelle = new Localisation(0, 0, 0, false);
 		factory.getLocalisationDAO().insert(element.getId(), piece.getId(), nouvelle);
+		pcs.firePropertyChange(EVT_ELEMENT_ASSIGNEE, null, element); // PUBLIE
 	}
 	
 	/**

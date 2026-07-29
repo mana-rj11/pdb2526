@@ -54,29 +54,27 @@ public class VuePieceController implements Initializable {
 	// Event Listener on Button.onAction
 	@FXML
 	public void actionValider(ActionEvent event) {
-		Piece piece;
+		// Piece piece;
 		// Vérifie la validité des encodages
 		boolean bad = checkData();
-		if (cbPlan.getValue() == null) {
-		    ctrl.showErreur("Veuillez sélectionner un plan");
-		    return;
-		}
 		if (!bad) {
 			// Création de l'objet
 			try {
-				piece = Piece.builder().nom(ztNom.getText().trim()).description(ztDescription.getText().trim())
-						.etage(BigDecimal.valueOf(spEtage.getValue()).setScale(1, RoundingMode.HALF_UP))
-						.typePiece(cbTypePiece.getValue())
-						.installation(ctrl.getFacade().getCurrentInstallation().getId()).plan(cbPlan.getValue()) // associe pieces au plan
-						.build();
-
+				Piece piece = Piece.builder()
+					.nom(ztNom.getText().trim())
+					.description(ztDescription.getText().trim())
+					.etage(BigDecimal.valueOf(spEtage.getValue()).setScale(1, RoundingMode.HALF_UP))
+					.typePiece(cbTypePiece.getValue())
+					.installation(ctrl.getFacade().getCurrentInstallation().getId())
+					.plan(cbPlan.getValue())
+					.build();
 				this.ctrl.getFacade().insertPiece(piece);
 				this.stage.close();
 			} catch (InstallationException e) {
 				ctrl.showErreur(e.getMessage());
 			}
 		}
-	}
+		}
 
 	/**
 	 * Vérifie la validité des champs et champ la pseudo-classe "errorClass" en
@@ -99,6 +97,12 @@ public class VuePieceController implements Initializable {
 		erreur = !(cbTypePiece.getValue() instanceof TypePiece);
 		cbTypePiece.pseudoClassStateChanged(errorClass, erreur);
 		bad = bad || erreur;
+		
+		// vérifie le plan 
+		erreur = cbPlan.getValue() == null;
+		cbPlan.pseudoClassStateChanged(errorClass, erreur);
+		bad = bad || erreur;
+		
 		return bad;
 	}
 
@@ -124,7 +128,22 @@ public class VuePieceController implements Initializable {
 		    @Override
 		    public Plan fromString(String s) { return null; }
 		}); // charge les plans dans la combobox
+		
+		cbTypePiece.setConverter(new StringConverter<TypePiece>() {
+			@Override
+			public String toString(TypePiece tp) {
+				return tp != null ? tp.getNom() : "";
+			}
+			@Override
+			public TypePiece fromString(String s) {
+				return listeTypePiece.stream()
+					.filter(tp -> tp.getNom().equals(s))
+					.findFirst().orElse(null);
+			}
+		});
 		}
+	
+		
 
 	@Override
 	public void initialize(URL url, ResourceBundle bundle) {
