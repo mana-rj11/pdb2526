@@ -98,20 +98,22 @@ public class VueListeElementsController implements Initializable {
 		chargerDonnees();
 		// ecoute les changements de pièces pour rafraichir la liste 
 		facade.addPropertyChangeListener(evt -> {
-			if (evt.getPropertyName().equals(Facade.EVT_PIECE_AJOUTEE)
-				|| evt.getPropertyName().equals(Facade.EVT_PIECE_SUPPRIMEE)) {
-				// Rafraichit la liste des pièces dans la combobox
-				javafx.application.Platform.runLater(() -> {
-					try {
+			javafx.application.Platform.runLater(() -> {
+				try {
+					if (evt.getPropertyName().equals(Facade.EVT_PIECE_AJOUTEE)
+						|| evt.getPropertyName().equals(Facade.EVT_PIECE_SUPPRIMEE)) {
+						// Rafraichit la liste des pièces dans la combobox
 						listePieces.setAll(facade.getListePieces());
-					} catch (Exception e) {
+				} else if (evt.getPropertyName().equals(Facade.EVT_PIECE_AJOUTEE)) {
+					// Un plan ajouté, rafraichit au cas ou
+					log.info("Plan ajouté, vue éléments notifiée");
+				}
+			} catch (Exception e) {
 						log.error("Erreur refresh pièces: " + e.getMessage());
-					}
-				});
-			}
-				
-		});
-	}
+			}	
+		});		
+	});
+}
 	
 	@Override
 	public void initialize(URL url, ResourceBundle bundle) {

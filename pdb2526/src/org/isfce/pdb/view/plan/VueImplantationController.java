@@ -291,16 +291,16 @@ public class VueImplantationController implements Initializable {
 						cbPlans.getItems().remove(p);
 					}
 				}
-				// Zoom avec CTRL + molette de la souris
-				scpCanvas.addEventFilter(javafx.scene.input.ScrollEvent.SCROLL, event -> {
-					if (event.isControlDown()) {
-						double delta = event.getDeltaY() > 0 ? 0.1 : -0.1;
-						zoom = Math.max(zoomMin, Math.min(zoomMax, zoom + delta));
-						zoomer();
-						event.consume();
-					}
-				});
 			}
+			// Zoom avec CTRL + molette de la souris
+			scpCanvas.addEventFilter(javafx.scene.input.ScrollEvent.SCROLL, event -> {
+				if (event.isControlDown()) {
+					double delta = event.getDeltaY() > 0 ? 0.1 : -0.1;
+					zoom = Math.max(zoomMin, Math.min(zoomMax, zoom + delta));
+					zoomer();
+					event.consume();
+				}
+			});
 			
 			cbPlans.setConverter(new StringConverter<Plan>() {
 				@Override 
@@ -380,14 +380,26 @@ public class VueImplantationController implements Initializable {
 		// ecoute l'ajout de pièces/plans pour rafraichir 
 		ctrl.getFacade().addPropertyChangeListener(evt -> {
 			javafx.application.Platform.runLater(() -> {
-				if (evt.getPropertyName().equals(Facade.EVT_PLAN_AJOUTEE)) {
-					try {
-						// rafraichit la liste des plans 
+				try {
+					if (evt.getPropertyName().equals(Facade.EVT_PLAN_AJOUTEE)) {
 						cbPlans.setItems(FXCollections.observableArrayList(
 							ctrl.getFacade().getListePlans()));
-					} catch (InstallationException e) {
-						log.error("Erreur refresh plans: " + e.getMessage());
+					} else if (evt.getPropertyName().equals(Facade.EVT_PIECE_AJOUTEE)
+						|| evt.getPropertyName().equals(Facade.EVT_PIECE_SUPPRIMEE)) {
+						// rafraichir le filtre par pièce si un plan est chargé
+						if (oPlanCharge.isPresent()) {
+							// charge toutes les pieces du plan, pas seulement celles avec les éléments
+							ObservableList<Piece> piecesDuPlan = FXCollections.observableArrayList();
+							piecesDuPlan.add(null);	// toutes les pieces
+							piecesDuPlan.addAll(ctrl.getFacade().getListePieces().stream()
+								.filter(p -> p.getPlan() != null
+									&& p.getPlan().getId() == oPlanCharge.get().getId())
+								.toList());
+							cbPieces.setItems(piecesDuPlan);
+						}
 					}
+				} catch (InstallationException e) {
+					log.error("Erreur refresh: " + e.getMessage());
 				}
 			});
 		});
