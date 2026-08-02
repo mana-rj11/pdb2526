@@ -302,6 +302,20 @@ public class VueImplantationController implements Initializable {
 				}
 			});
 			
+			// plan avec clic doit maintenu
+			// final double[] panStart = new double[2];
+			// final boolean[] panning = new boolean[] {false};
+			
+			scpCanvas.addEventFilter(javafx.scene.input.MouseEvent.MOUSE_PRESSED, e -> {
+				if (e.isSecondaryButtonDown()) {
+					scpCanvas.setPannable(true);
+				}
+			});
+			scpCanvas.addEventFilter(javafx.scene.input.MouseEvent.MOUSE_RELEASED, _ -> {
+				scpCanvas.setPannable(false);
+			});
+			
+			// converter pour afficher le nom du plan 
 			cbPlans.setConverter(new StringConverter<Plan>() {
 				@Override 
 				public String toString(Plan plan) {
@@ -313,7 +327,6 @@ public class VueImplantationController implements Initializable {
 				}
 			});
 				
-			
 			// mets la liste observable de la comboBox cbPlans
 			cbPlans.setItems(obsPlan);
 			
