@@ -199,6 +199,7 @@ public class VueImplantationController implements Initializable {
 		ObservableList<Element> tousLesElements = mapPlanElements.get(oPlanCharge.get().getId());
 		if (filtre == null) {
 			lstElements.setItems(tousLesElements);
+			lstElements.setPlaceholder(new javafx.scene.control.Label("Aucun élément pour ce plan"));
 		} else {
 			Map<Integer, Piece> elementPieceMap = mapPlanElementPiece.get(oPlanCharge.get().getId());
 			ObservableList<Element> filtres = FXCollections.observableArrayList(
@@ -206,8 +207,13 @@ public class VueImplantationController implements Initializable {
 							.filter(e -> filtre.equals(elementPieceMap.get(e.getId())))
 							.toList());
 			lstElements.setItems(filtres);
+			if (filtres.isEmpty()) {
+				lstElements.setPlaceholder(new javafx.scene.control.Label(
+					"Aucun élément assigné à \"" + filtre.getNom() + "\""));
+			}
 		}
 	}
+
 	/**
 	 * Active/désactive l'affichage des noms de pièces
 	 */
@@ -548,6 +554,7 @@ public class VueImplantationController implements Initializable {
 		});
 
 		lstElements.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+		lstElements.setPlaceholder(new javafx.scene.control.Label("Sélectionnez un plan"));
 
 		// Pour l'élément selectionné, s'il est placé, on active la boundingBox de son ElementView associé
 		lstElements.getSelectionModel().selectedItemProperty().addListener((_, oldElem, newElem) -> {
