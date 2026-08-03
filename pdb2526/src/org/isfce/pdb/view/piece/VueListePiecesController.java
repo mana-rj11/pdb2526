@@ -202,8 +202,6 @@ public class VueListePiecesController implements Initializable {
 	});
 	
 	
-					
-		
 		tblPieces.setEditable(true);
 		colNom.setEditable(false);
 		colDescription.setEditable(false);
@@ -329,13 +327,16 @@ public class VueListePiecesController implements Initializable {
 			btDel.setOnAction(_ -> {
 				Piece obj = getTableRow().getItem();
 				if (obj != null) {
-					mapUpdate.remove(obj.getId());
-					update.set(!mapUpdate.isEmpty());
-					try {
-						if (facade.deletePiece(obj))
-							obsPieces.remove(obj);
-					} catch (InstallationException e1) {
-						ctrl.showErreur(I18N.getString(e1.getMessage()));
+					// confirmation avant suppression
+					if (ctrl.showConfirmation("Supprimer la pièce \"" + obj.getNom() + "\" ?")) {
+						mapUpdate.remove(obj.getId());
+						update.set(!mapUpdate.isEmpty());
+						try {
+							if (facade.deletePiece(obj))
+								obsPieces.remove(obj);
+						} catch (InstallationException e1) {
+							ctrl.showErreur(I18N.getString(e1.getMessage()));
+						}
 					}
 				}
 			});
