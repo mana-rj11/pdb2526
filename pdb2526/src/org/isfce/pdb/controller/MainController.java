@@ -498,6 +498,12 @@ public class MainController extends Application {
 				try {
 					facade.chargeInstallation(inst.getId());
 					installationChargee.set(true);
+					facade.chargeInstallation(inst.getId());
+					installationChargee.set(true);
+					// met a jour le titre de la fenêtre
+					mainStage.setTitle("Projet PDB 2526 - Installation n°" + inst.getId()
+						+ " | " + inst.getProprietaire()
+						+ " | " + inst.getAdresse().getVille());
 				} catch (InstallationException ex) {
 					showErreur(ex.getMessage());
 				}
