@@ -55,6 +55,7 @@
 <Separator style="-fx-padding: 5 0 5 0;"/>
 <ListView fx:id="lstElements" prefHeight="585.0" prefWidth="200.0" />
 <CheckBox fx:id="cbAfficherNoms" text="Afficher noms" selected="true" onAction="#actionToggleNoms"/>
+<Label fx:id="lblCompteur" text="" style="-fx-font-family: Georgia; -fx-font-size: 12px; -fx-padding: 5;"/>
 <Separator style="-fx-padding: 5 0 5 0;"/>
 <HBox spacing="5" alignment="CENTER">
 	<children>

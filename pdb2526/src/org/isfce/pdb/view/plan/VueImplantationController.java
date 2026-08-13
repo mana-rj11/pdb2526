@@ -31,6 +31,7 @@ import javafx.scene.Group;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
@@ -77,6 +78,9 @@ public class VueImplantationController implements Initializable {
 
 	@FXML
 	private ListView<Element> lstElements;
+	
+	@FXML
+	private Label lblCompteur;
 
 	/* pas besoin pour l'instant */
 	private Stage stage;
@@ -186,6 +190,7 @@ public class VueImplantationController implements Initializable {
 			// reinitialise le zoom
 			zoom = 1.0;
 			zoomer();
+			majCompteur();
 
 		}
 
@@ -380,6 +385,7 @@ public class VueImplantationController implements Initializable {
 					oElementView.get().getElement().getLocalisation().setPlace(false);
 					elementsModifies.add(elem.getId()); // marque comme modifié
 					lstElements.refresh(); // met a jour le style visuel
+					majCompteur();
 					event.consume();
 				}
 			});
@@ -545,6 +551,7 @@ public class VueImplantationController implements Initializable {
 				element.getLocalisation().setPlace(true);//indique qu'il est placé
 				elementsModifies.add(element.getId()); // marque comme modifié
 				lstElements.refresh(); // met a jour le style visuel
+				majCompteur();
 
 				elementView.setSelected(true);//sélectionne l'élément que l'on vient de mettre
 			}
@@ -676,6 +683,20 @@ public class VueImplantationController implements Initializable {
 		pane.setScaleX(zoom);
 		pane.setScaleY(zoom);
 	}
+	
+	/**
+	 * Met a jour le compteur d'éléments placés / total
+	 */
+	private void majCompteur() {
+		if (oPlanCharge.isPresent()) {
+			ObservableList<Element> elements = mapPlanElements.get(oPlanCharge.get().getId());
+			long places = elements.stream()
+				.filter(e -> e.getLocalisation() != null && e.getLocalisation().isPlace())
+				.count();
+			lblCompteur.setText(places + " / " + elements.size() + " placés");
+		}
+	}
+	
 
 }
 
