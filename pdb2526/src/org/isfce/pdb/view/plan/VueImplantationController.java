@@ -364,8 +364,16 @@ public class VueImplantationController implements Initializable {
 				mapPlanNodes.put(plan.getId(), nodes);
 				mapPlanElementPiece.put(plan.getId(), elementPieceMap);
 			}
+			
 			//Action sur la touche R (rotation) et DEL (suppression)
 			stage.getScene().setOnKeyPressed(event -> {
+				// CTRL S pour sauvegarder, fonctionne toujours
+				if (event.isControlDown() && event.getCode() == KeyCode.S) {
+					actionValider(null);
+					event.consume();
+					return;
+				}
+				
 				Element elem = lstElements.getSelectionModel().getSelectedItem();
 				if (elem == null || elem.getLocalisation() == null || !elem.getLocalisation().isPlace())
 					return;
@@ -387,7 +395,7 @@ public class VueImplantationController implements Initializable {
 					lstElements.refresh(); // met a jour le style visuel
 					majCompteur();
 					event.consume();
-				}
+				} 
 			});
 			
 			// désélectionne les ElementView de l'ancien Plan si on change de plan
