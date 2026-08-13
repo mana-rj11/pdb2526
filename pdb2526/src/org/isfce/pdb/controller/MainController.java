@@ -35,6 +35,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.ListCell;
@@ -127,6 +128,14 @@ public class MainController extends Application {
 		bt6.disableProperty().bind(installationChargee.not());
 		
 		cp.setLeft(leftPane);
+		
+		bt1.setTooltip(new Tooltip("Sélectionner une installation à charger"));
+		bt2.setTooltip(new Tooltip("Créer une nouvelle pièce pour l'installation"));
+		bt3.setTooltip(new Tooltip("Voir et modifier la liste des pièces"));
+		bt4.setTooltip(new Tooltip("Ajouter un nouveau plan d'étage"));
+		bt5.setTooltip(new Tooltip("Voir les éléments et les assigner aux pièces"));
+		bt6.setTooltip(new Tooltip("Placer les éléments sur les plans"));
+		
 		
 		Scene scene = new Scene(cp, 500, 400);
 		mainStage.setScene(scene);
