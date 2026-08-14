@@ -4,6 +4,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.List;
 import java.util.Optional;
+// import java.util.Collection;
 
 import org.isfce.pdb.dao.DAOFactory;
 import org.isfce.pdb.exceptions.InstallationException;
@@ -15,26 +16,27 @@ import org.isfce.pdb.model.Plan;
 import org.isfce.pdb.model.TypePiece;
 import org.isfce.pdb.view.bundle.I18N;
 
+
+/**
+ * Facade couche de service entre les ves et les DAO
+ * Centralise l'accès aux données et gère la publication des événements
+ */
 public class Facade {
 	
-	// private static final Logger logger = Logger.getLogger(Facade.class.getName());
 
 	private DAOFactory factory;
 	private Installation installation;
-	// pièces de l'installation
-	// private List<Piece> pieces = new ArrayList<Piece>();
-	// élements de l'installation
-	// private List<Element> elements;
+	
 	
 	// publication des changements
 	private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 	
 	// constantes pour les événements
 	public static final String EVT_PIECE_AJOUTEE = "pieceAjoutee";
-	public static final String EVT_PIECE_SUPPRIMEE = "pieceSuprimee";
+	public static final String EVT_PIECE_SUPPRIMEE = "pieceSupprimee";
 	public static final String EVT_PIECE_MODIFIEE = "pieceModifiee";
-	public static final String EVT_PLAN_AJOUTEE = "planAjoutee";
-	public static final String EVT_ELEMENT_ASSIGNEE = "elementAssignee";
+	public static final String EVT_PLAN_AJOUTEE = "planAjoute";
+	public static final String EVT_ELEMENT_ASSIGNEE = "elementAssigne";
 	
 	public void addPropertyChangeListener(PropertyChangeListener listener) {
 		pcs.addPropertyChangeListener(listener);
@@ -110,7 +112,6 @@ public class Facade {
 		try {
 			factory.getPieceDAO().insert(piece);
 			pcs.firePropertyChange(EVT_PIECE_AJOUTEE, null, piece); // PUBLIE
-			// pieces.add(piece);
 		} catch (Exception e) {
 			if (e instanceof InstallationException exception)
 				throw exception;
@@ -189,7 +190,7 @@ public class Facade {
 	/**
 	 * Retourne la piece dans laquelle un element est assignee, si elle existe 
 	 */
-	public java.util.Optional<Piece> getPieceDeElement(Element element) throws InstallationException {
+	public Optional<Piece> getPieceDeElement(Element element) throws InstallationException {
 		Integer idPiece = getPieceIdAssignee(element);
 		if (idPiece == null)
 			return java.util.Optional.empty();
@@ -199,7 +200,7 @@ public class Facade {
 	}
 	
 	/**
-	 * Assigne un id element ...
+	 * Assigne un element à une pièce (delete + insert localisation)
 	 */
 	public void assignerPiece(Element element, Piece piece) throws InstallationException {
 		Optional<Localisation> existante = factory.getLocalisationDAO().getFromId(element.getId());
@@ -211,7 +212,7 @@ public class Facade {
 	}
 	
 	/**
-	 * Sauvegarde en base la localisation actuelle de chaque 
+	 * Sauvegarde uniquement les localisation modifiées 
 	 */
 	public void sauvegarderImplantation(java.util.Collection<Element> elements) throws InstallationException {
 		for (Element e : elements) {
@@ -229,7 +230,7 @@ public class Facade {
 	}
 	
 	/**
-	 * Retourne les ...
+	 * Retourne les éléments associés à un plan via JOIN SQL
 	 */
 	public List<Element> getElementsPlan(Plan plan) throws InstallationException {
 		return factory.getElementDAO().getListeFromPlan(plan.getId());
