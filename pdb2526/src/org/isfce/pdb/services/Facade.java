@@ -2,6 +2,7 @@ package org.isfce.pdb.services;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 // import java.util.Collection;
@@ -26,6 +27,7 @@ public class Facade {
 
 	private DAOFactory factory;
 	private Installation installation;
+	private List<Element> elementsCache = null;
 	
 	
 	// publication des changements
@@ -61,6 +63,8 @@ public class Facade {
 	public void chargeInstallation(int id) throws InstallationException {
 		installation = factory.getInstallationDAO().getFromId(id)
 				.orElseThrow(() -> new InstallationException(I18N.getString("err.install.inconnue")));
+		// charge le cache des éléments
+		elementsCache = factory.getElementDAO().getListeFromInstallation(installation.getId());
 	}
 	
 	/**
@@ -176,6 +180,8 @@ public class Facade {
 	 * Retourne tous les éléments de l'installation courante
 	 */
 	public List<Element> getListeElements() throws InstallationException {
+		if (elementsCache == null)
+			elementsCache = factory.getElementDAO().getListeFromInstallation(getCurrentInstallation().getId());
 		return factory.getElementDAO().getListeFromInstallation(getCurrentInstallation().getId());
 	}
 	
@@ -208,18 +214,20 @@ public class Facade {
 			factory.getLocalisationDAO().delete(element.getId());
 		Localisation nouvelle = new Localisation(0, 0, 0, false);
 		factory.getLocalisationDAO().insert(element.getId(), piece.getId(), nouvelle);
+		elementsCache = null;	// Invalide le cache
 		pcs.firePropertyChange(EVT_ELEMENT_ASSIGNEE, null, element); // PUBLIE
 	}
 	
 	/**
 	 * Sauvegarde uniquement les localisation modifiées 
 	 */
-	public void sauvegarderImplantation(java.util.Collection<Element> elements) throws InstallationException {
+	public void sauvegarderImplantation(Collection<Element> elements) throws InstallationException {
 		for (Element e : elements) {
 			if (e.getLocalisation() != null) {
 				factory.getLocalisationDAO().update(e.getId(), e.getLocalisation());
 			}
 		}
+		elementsCache = null;	// invalide le cache
 	}
 	
 	/**

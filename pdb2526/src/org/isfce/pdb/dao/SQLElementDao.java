@@ -105,7 +105,7 @@ public class SQLElementDao implements IElementDao {
 					rs.getInt("ORDRE_ELE")));
 			}
 		} catch (SQLException e) {
-			log.error("Reeur chargement éléments du plan : " + e.getMessage());
+			log.error("Ereur chargement éléments du plan : " + e.getMessage());
 			return liste;
 		}
 		

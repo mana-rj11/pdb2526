@@ -202,14 +202,13 @@ public class SQLPieceDao implements IPieceDao {
             ps.setString(2, obj.getDescription());
             ps.setBigDecimal(3, obj.getEtage());
             ps.setString(4, obj.getTypePiece().getCode());
-            // nouvelle modif
             if (obj.getPlan() != null)
             	ps.setInt(5, obj.getPlan().getId());
             else
             	ps.setNull(5, java.sql.Types.INTEGER);
             ps.setDouble(6, obj.getXNom());
             ps.setDouble(7, obj.getYNom());
-            ps.setInt(8, obj.getId());	// décalé de 6 à 8
+            ps.setInt(8, obj.getId());
             int nb = ps.executeUpdate();
             if (nb == 1) {
             	if (!this.connexion.getAutoCommit())
