@@ -64,6 +64,12 @@ public class VuePlanController {
 		// ouvre l'explorateur de fichier pour sélectionner une image
 		FileChooser fc = new FileChooser();
 		fc.setTitle("Selectionner un plan");
+		// ouvre directement le FileChooser dans le dossier PDB2526
+		File dossierInitial = new File("C:\\PDB2526");
+		if (dossierInitial.exists() && dossierInitial.isDirectory()) {
+			fc.setInitialDirectory(dossierInitial);
+		}
+		
 		// filtre pour n'afficher que les images
 		fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Images", "*.png", "*.jpg"));
 		// ouvre la boîte du dialogue
@@ -87,12 +93,7 @@ public class VuePlanController {
 				ctrl.showErreur("Erreur lors de la copie : " + e.getMessage());
 				log.error("Copie fichier échouée : " + e.getMessage());
 			}
-			
-			
-			
-			
-			
-			
+		
 			
 		}
 	}
