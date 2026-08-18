@@ -247,15 +247,6 @@ public class VueListePiecesController implements Initializable {
 		update.set(true);
 	});
 	
-	// colonne DESCRIPTION éditable
-	colDescription.setEditable(true);
-	colDescription.setCellFactory(TextFieldTableCell.forTableColumn());
-	colDescription.setOnEditCancel(e -> { 
-		Piece p = e.getRowValue();
-		p.setDescription(e.getNewValue());
-		mapUpdate.put(p.getId(), p);
-		update.set(true);
-	});
 	
 	// colonne ETAGE avec Spinner
 	colPlan.setEditable(true);
