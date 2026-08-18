@@ -658,15 +658,15 @@ public class VueImplantationController implements Initializable {
 				final Piece p = piece;
 				txt.setOnMousePressed(ev -> {
 					txt.setUserData(new double[]{
-						ev.getSceneX() - txt.getTranslateX(),
-						ev.getSceneY() - txt.getTranslateY()
+						ev.getX(),
+						ev.getY()
 					});
 					ev.consume();
 				});
 				txt.setOnMouseDragged(ev -> {
-					double[] delta = (double[]) txt.getUserData();
-					txt.setTranslateX(ev.getSceneX() - delta[0]);
-					txt.setTranslateY(ev.getSceneY() - delta[1]);
+					double[] offset = (double[]) txt.getUserData();
+					txt.setTranslateX(txt.getTranslateX() + ev.getX() - offset[0]);
+					txt.setTranslateY(txt.getTranslateY() + ev.getY() - offset[1]);
 					ev.consume();
 				});
 				txt.setOnMouseReleased(ev -> {
