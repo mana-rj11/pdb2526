@@ -294,7 +294,7 @@ public class VueListePiecesController implements Initializable {
 	};
 	colTypePiece.setCellFactory(
 		ComboBoxTableCell.forTableColumn(converterType, typePieces));
-	colTypePiece.setOnEditCancel(e -> {
+	colTypePiece.setOnEditCommit(e -> {
 		Piece p = e.getRowValue();
 		p.setTypePiece(e.getNewValue());
 		mapUpdate.put(p.getId(), p);
