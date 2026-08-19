@@ -27,5 +27,7 @@ public interface ILocalisationDao {
 	boolean update(int idElement, Localisation obj) throws InstallationException;
 	
 	boolean delete(int idElement) throws InstallationException;
+	
+	void deleteByPiece(int idPiece) throws InstallationException;
 }
 

@@ -141,6 +141,9 @@ public class Facade {
 	public boolean deletePiece(Piece obj) throws InstallationException {
 		boolean ok = false;
 		try {
+			// supprime d'abord les localisations liées à cette pièce
+			factory.getLocalisationDAO().deleteByPiece(obj.getId());
+			// puis supprime la pièce
 			ok = factory.getPieceDAO().delete(obj);
 			if (ok) pcs.firePropertyChange(EVT_PIECE_SUPPRIMEE, obj, null);  // PUBLIE
 		} catch (Exception e) {

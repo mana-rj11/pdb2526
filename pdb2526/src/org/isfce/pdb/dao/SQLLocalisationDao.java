@@ -3,11 +3,15 @@ package org.isfce.pdb.dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Optional;
 import java.util.logging.Logger;
 
 import org.isfce.pdb.exceptions.InstallationException;
 import org.isfce.pdb.model.Localisation;
+
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
 
 /**
  * Implémentation SQL du DAO Localisation pour Firebird
@@ -125,6 +129,17 @@ public class SQLLocalisationDao implements ILocalisationDao {
 		} catch (Exception e) {
 			factory.dispatchException(e, "delete Localisation"+ idElement);
 			return false;
+		}
+	}
+	
+	public void deleteByPiece(int idPiece) throws InstallationException {
+		String sql = "DELETE FROM TLOCALISATION WHERE FKPIECE_LOC = ?";
+		try (PreparedStatement ps = factory.getConnection().prepareStatement(sql)) {
+			ps.setInt(1, idPiece);
+			int nb = ps.executeUpdate();
+			log.info(nb + " localisation(s) supprimée(s) pour la pièce " + idPiece);
+		} catch (SQLException e) {
+			factory.dispatchException(e, "[DEL] Localisations pièce " + idPiece);
 		}
 	}
 
