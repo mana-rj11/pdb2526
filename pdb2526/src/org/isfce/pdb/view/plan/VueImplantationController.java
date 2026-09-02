@@ -641,7 +641,12 @@ public class VueImplantationController implements Initializable {
 		Set<Integer> dejaVu = new HashSet<>();
 		for (Piece piece : pieces.values()) {
 			if (piece != null && dejaVu.add(piece.getId())) {
-				Text txt = new Text(piece.getNom());
+				// Text txt = new Text(piece.getNom());
+				
+				String label = piece.getSuperficie() != null
+					  ? piece.getNom() + "(" + piece.getSuperficie() + "m²)"
+					  : piece.getNom();
+				Text txt = new Text(label);
 				txt.setFont(Font.font("Georgia", javafx.scene.text.FontWeight.BOLD, 16));
 				txt.setFill(Color.BLACK);
 				txt.setFill(Color.web("#623BFF"));	// Bleu

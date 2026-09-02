@@ -22,4 +22,5 @@ public class Piece {
 	private Plan plan;
 	private double xNom;	// position X du nom sur le plan 
 	private double yNom;	// position Y du nom sur le plan 
+	private BigDecimal superficie;	// superficie en m²
 }

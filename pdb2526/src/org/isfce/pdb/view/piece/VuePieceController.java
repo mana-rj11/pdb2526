@@ -38,6 +38,8 @@ public class VuePieceController implements Initializable {
 	private ComboBox<TypePiece> cbTypePiece;
 	@FXML 
 	private ComboBox<Plan> cbPlan;	// plan ajouté
+	@FXML 
+	private Spinner<Double> spSuperficie;	// new
 
 	// private ResourceBundle bundle;
 
@@ -67,6 +69,7 @@ public class VuePieceController implements Initializable {
 					.typePiece(cbTypePiece.getValue())
 					.installation(ctrl.getFacade().getCurrentInstallation().getId())
 					.plan(cbPlan.getValue())
+					.superficie(BigDecimal.valueOf(spSuperficie.getValue()).setScale(1, RoundingMode.HALF_UP))
 					.build();
 				this.ctrl.getFacade().insertPiece(piece);
 				this.stage.close();
@@ -141,6 +144,8 @@ public class VuePieceController implements Initializable {
 					.findFirst().orElse(null);
 			}
 		});
+		// Initialise le Spinner superficie : 0 à 500 m², pas de 0.5
+		spSuperficie.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(0, 500, 0, 0.5));
 		}
 	
 		

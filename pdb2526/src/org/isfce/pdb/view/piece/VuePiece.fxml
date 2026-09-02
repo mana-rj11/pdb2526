@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 
-<AnchorPane prefHeight="300.0" prefWidth="400.0"
+<AnchorPane prefHeight="340.0" prefWidth="400.0"
     xmlns:fx="http://javafx.com/fxml/1"
     xmlns="http://javafx.com/javafx/23.0.1"
     fx:controller="org.isfce.pdb.view.piece.VuePieceController">
@@ -33,7 +33,12 @@
       
       <Label styleClass="main-label" text="Plan"
     	  AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="200.0" AnchorPane.topAnchor="180.0"/>
-	  <ComboBox fx:id="cbPlan" AnchorPane.leftAnchor="200.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="180.0"/>    
+	  <ComboBox fx:id="cbPlan" AnchorPane.leftAnchor="200.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="180.0"/>   
+	  
+	  <Label styleClass="main-label" text="Superficie (m²)"
+    	  AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="200.0" AnchorPane.topAnchor="260.0" />
+	  <Spinner fx:id="spSuperficie"
+    	  AnchorPane.leftAnchor="200.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="260.0" /> 
           
           
       <ComboBox fx:id="cbTypePiece"

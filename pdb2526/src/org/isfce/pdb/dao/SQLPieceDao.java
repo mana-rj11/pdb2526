@@ -21,22 +21,22 @@ import lombok.extern.slf4j.Slf4j;
 public class SQLPieceDao implements IPieceDao {
 
     private static String SQL_GET_FROM_ID = """
-            SELECT NOM_PIE, DESCRIPTION_PIE, ETAGE_PIE, FKTYPE_PIE, FKINSTALLATION_PIE, FKPLAN_PIE, X_NOM_PIE, Y_NOM_PIE
+            SELECT NOM_PIE, DESCRIPTION_PIE, ETAGE_PIE, FKTYPE_PIE, FKINSTALLATION_PIE, FKPLAN_PIE, X_NOM_PIE, Y_NOM_PIE, SUPERFICIE_PIE
             FROM TPIECE WHERE NUM_PIE = ?
             """;
 
     private static String SQL_GET_LISTE_FROM_INST = """
-            SELECT NUM_PIE, NOM_PIE, DESCRIPTION_PIE, ETAGE_PIE, FKTYPE_PIE, FKPLAN_PIE, X_NOM_PIE, Y_NOM_PIE
+            SELECT NUM_PIE, NOM_PIE, DESCRIPTION_PIE, ETAGE_PIE, FKTYPE_PIE, FKPLAN_PIE, X_NOM_PIE, Y_NOM_PIE, SUPERFICIE_PIE
             FROM TPIECE WHERE FKINSTALLATION_PIE=? ORDER BY ETAGE_PIE, FKTYPE_PIE
             """;
 
     private static String SQL_INSERT = """
-            INSERT INTO TPIECE (NOM_PIE, DESCRIPTION_PIE, ETAGE_PIE, FKTYPE_PIE, FKINSTALLATION_PIE, FKPLAN_PIE)
-            VALUES (?,?,?,?,?,?)
-            """;
+            INSERT INTO TPIECE (NOM_PIE, DESCRIPTION_PIE, ETAGE_PIE, FKTYPE_PIE, FKINSTALLATION_PIE, FKPLAN_PIE, SUPERFICIE_PIE)	
+            VALUES (?,?,?,?,?,?,?)
+            """;	// superficie
 
     private static String SQL_UPDATE = """
-            UPDATE TPIECE SET NOM_PIE = ?, DESCRIPTION_PIE = ?, ETAGE_PIE = ?, FKTYPE_PIE = ?, FKPLAN_PIE = ?, X_NOM_PIE = ?, Y_NOM_PIE = ?
+            UPDATE TPIECE SET NOM_PIE = ?, DESCRIPTION_PIE = ?, ETAGE_PIE = ?, FKTYPE_PIE = ?, FKPLAN_PIE = ?, X_NOM_PIE = ?, Y_NOM_PIE = ? ,SUPERFICIE_PIE = ?
             WHERE NUM_PIE = ?
             """;
 
@@ -68,6 +68,8 @@ public class SQLPieceDao implements IPieceDao {
                 Integer fkPlan = (Integer) rs.getObject("FKPLAN_PIE");
                 double xNom = rs.getDouble("X_NOM_PIE");	// new
                 double yNom = rs.getDouble("Y_NOM_PIE");	// new
+                BigDecimal superficie = rs.getBigDecimal("SUPERFICIE_PIE");	// superficie
+                if (superficie != null) superficie = superficie.setScale(1);	// superficie
                 // rs peut fermé maintenant
                 
                 // résoudre les objets liés
@@ -84,6 +86,7 @@ public class SQLPieceDao implements IPieceDao {
                         .plan(plan)
                         .xNom(xNom)
                         .yNom(yNom)
+                        .superficie(superficie)	// superficie
                         .build();
                 log.debug("Une pièce est chargée: " + obj);
             }
@@ -100,7 +103,7 @@ public class SQLPieceDao implements IPieceDao {
      * la même connexion (sinon Firebird ferme implicitement le curseur).
      */
     private record RawPiece(int id, String nom, String description, BigDecimal etage,
-                              String typeCode, Integer fkPlan, double xNom, double yNom) {
+                              String typeCode, Integer fkPlan, double xNom, double yNom, BigDecimal superficie) {	// ajouter superficie
     }
 
     @Override
@@ -121,7 +124,8 @@ public class SQLPieceDao implements IPieceDao {
                         rs.getString("FKTYPE_PIE"),
                         (Integer) rs.getObject("FKPLAN_PIE"),
                         rs.getDouble("X_NOM_PIE"),	// new
-                        rs.getDouble("Y_NOM_PIE")	// new
+                        rs.getDouble("Y_NOM_PIE"),	// new
+                        rs.getBigDecimal("SUPERFICIE_PIE")
                 ));
             }
         } catch (SQLException e) {
@@ -144,6 +148,7 @@ public class SQLPieceDao implements IPieceDao {
                         .plan(plan)
                         .xNom(r.xNom())		// new
                         .yNom(r.yNom())		// new
+                        .superficie(r.superficie()!= null ? r.superficie().setScale(1) : null)
                         .build();
                 liste.add(obj);
             } catch (InstallationException e) {
@@ -174,6 +179,7 @@ public class SQLPieceDao implements IPieceDao {
             ps.setInt(5, obj.getInstallation());
             Integer idPlan = obj.getPlan() != null ? obj.getPlan().getId() : null;
             ps.setObject(6, idPlan, java.sql.Types.INTEGER);
+            ps.setBigDecimal(7, obj.getSuperficie());	// new
             int nb = ps.executeUpdate();
             if (nb == 1) {
                 ResultSet rs = ps.getGeneratedKeys();
@@ -208,7 +214,9 @@ public class SQLPieceDao implements IPieceDao {
             	ps.setNull(5, java.sql.Types.INTEGER);
             ps.setDouble(6, obj.getXNom());
             ps.setDouble(7, obj.getYNom());
-            ps.setInt(8, obj.getId());
+            ps.setBigDecimal(8, obj.getSuperficie()); // new
+            ps.setInt(9, obj.getId()); //
+            
             int nb = ps.executeUpdate();
             if (nb == 1) {
             	if (!this.connexion.getAutoCommit())
