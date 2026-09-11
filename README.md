@@ -34,9 +34,9 @@ INSTRUCTIONS : Remplace les placeholders ci-dessous par tes screenshots.
 |:-:|:-:|
 | ![Éléments](screenshots/liste_éléments.png) | ![Implantation](screenshots/implantation_rez.png) |
 
-| Implantation étage | Zoom |
-|:-:|:-:|
-| ![Étage](screenshots/implantation_etageV1.png) |  ![Étage](screenshots/implantation_etageV2.png) | ![Zoom](screenshots/zoom.png) |
+| Implantation étage V1 | Implantation étage V2 | Zoom |
+|:-:|:-:|:-:|
+| ![Étage V1](screenshots/implantation_etageV1.png) | ![Étage V2](screenshots/implantation_etageV2.png) | ![Zoom](screenshots/zoom.png) |
 
 ---
 
