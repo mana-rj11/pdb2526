@@ -24,19 +24,19 @@ INSTRUCTIONS : Remplace les placeholders ci-dessous par tes screenshots.
 
 | Menu principal | Sélection installation |
 |:-:|:-:|
-| ![Menu](screenshots/menu.png) | ![Installation](screenshots/installation.png) |
+| ![Menu](pdb2526/screenshots/menu.png) | ![Installation](pdb2526/screenshots/installation.png) |
 
 | Liste des pièces | Création d'une pièce |
 |:-:|:-:|
-| ![Pièces](screenshots/liste_pieces.png) | ![Création](screenshots/creation_piece.png) |
+| ![Pièces](pdb2526/screenshots/liste_pieces.png) | ![Création](pdb2526/screenshots/creation_piece.png) |
 
 | Liste des éléments | Implantation rez-de-chaussée |
 |:-:|:-:|
-| ![Éléments](screenshots/liste_éléments.png) | ![Implantation](screenshots/implantation_rez.png) |
+| ![Éléments](pdb2526/screenshots/liste_éléments.png) | ![Implantation](pdb2526/screenshots/implantation_rez.png) |
 
 | Implantation étage V1 | Implantation étage V2 | Zoom |
 |:-:|:-:|:-:|
-| ![Étage V1](screenshots/implantation_etageV1.png) | ![Étage V2](screenshots/implantation_etageV2.png) | ![Zoom](screenshots/zoom.png) |
+| ![Étage V1](pdb2526/screenshots/implantation_etageV1.png) | ![Étage V2](pdb2526/screenshots/implantation_etageV2.png) | ![Zoom](pdb2526/screenshots/zoom.png) |
 
 ---
 
