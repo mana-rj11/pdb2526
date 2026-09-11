@@ -1,6 +1,6 @@
 # PDB2526 — Plan d'implantation d'une installation électrique
 
-Application de bureau JavaFX pour la gestion et le positionnement visuel d'appareils électriques sur des plans d'implantation. Développé dans le cadre du cours SGBD à l'ISFCE Bruxelles (2025-2026).
+Application de bureau JavaFX pour la gestion et le positionnement visuel d'appareils électriques sur des plans d'implantation. Développé dans le cadre du cours Projet de développement SGBD à l'ISFCE Bruxelles (2025-2026).
 
 ---
 
